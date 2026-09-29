@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { getDepartamento, getProducto, getRelacionados } from "@/lib/data";
+import { getDepartamento, getLinea, getProducto, getRelacionados } from "@/lib/data";
 import { SITE } from "@/lib/config";
-import { gs, urlProducto } from "@/lib/format";
+import { disponibles, gs, urlProducto } from "@/lib/format";
 import Migas, { type Miga } from "@/components/Migas";
 import JsonLd from "@/components/JsonLd";
 import AgregarCarrito from "@/components/AgregarCarrito";
@@ -38,6 +38,13 @@ export default async function PaginaProducto({ params }: Props) {
   const cod = decodeURIComponent(codRaw);
   const p = await getProducto(cod);
   if (!p) notFound();
+
+  // Solo se publican artículos con stock: sin stock, llevar a su categoría (o 404).
+  if ((p.cant_dispon ?? 0) <= 0) {
+    const linea = p.linea_slug ? await getLinea(p.linea_slug) : null;
+    if (linea) permanentRedirect(`/c/${linea.slug}`);
+    notFound();
+  }
 
   const url = urlProducto(p);
   if (`/p/${encodeURIComponent(cod)}/${slug}` !== url) permanentRedirect(url);
@@ -80,7 +87,7 @@ export default async function PaginaProducto({ params }: Props) {
           <div className="rounded-2xl border border-borde bg-white p-4 md:p-5">
             <div className="text-3xl font-extrabold text-marca">{gs(p.precio_venta)}</div>
             <div className={`mt-1 text-sm font-semibold ${hayStock ? "text-ok" : "text-suave"}`}>
-              {hayStock ? "● En stock" : "Consultar disponibilidad"}
+              {hayStock ? `● En stock: ${disponibles(p.cant_dispon)}` : "Sin stock"}
             </div>
             <div className="mt-4">
               <AgregarCarrito

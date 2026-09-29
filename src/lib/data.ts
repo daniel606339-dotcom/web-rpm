@@ -68,6 +68,9 @@ export interface Producto extends ProductoResumen {
   cod_familia: string | null;
 }
 
+/** Regla de publicación: solo artículos con stock disponible. */
+export const CON_STOCK: Filtro = { op: "gt", col: "cant_dispon", val: 0 };
+
 const COLS_RESUMEN =
   "cod_articulo,nombre,foto_url,precio_venta,cant_dispon,slug,marca_nombre,linea_nombre";
 
@@ -82,14 +85,19 @@ export const getDepartamentos = cache(async () => {
   return filas;
 });
 
+/** Líneas publicadas que tienen al menos un producto con stock (las vacías no se muestran). */
 export const getLineas = cache(async () => {
-  const { filas } = await consultar<Linea>("lineas", {
-    select: "cod_linea,nombre,slug,departamento,publicar,seo_title,seo_description,texto",
-    filtros: [{ op: "eq", col: "publicar", val: true }],
-    orden: [{ col: "nombre" }],
-    revalidar: 3600,
-  });
-  return filas;
+  const [{ filas }, conStock] = await Promise.all([
+    consultar<Linea>("lineas", {
+      select: "cod_linea,nombre,slug,departamento,publicar,seo_title,seo_description,texto",
+      filtros: [{ op: "eq", col: "publicar", val: true }],
+      orden: [{ col: "nombre" }],
+      revalidar: 3600,
+    }),
+    consultar<{ cod_linea: string }>("lineas_con_stock", { select: "cod_linea", revalidar: 900 }),
+  ]);
+  const ok = new Set(conStock.filas.map((x) => x.cod_linea));
+  return filas.filter((l) => ok.has(l.cod_linea));
 });
 
 export const getColecciones = cache(async () => {
@@ -113,7 +121,7 @@ export const getMenu = cache(async (): Promise<MenuDepartamento[]> => {
     consultar<{ cod_linea: string; departamento: string }>("linea_menu", { revalidar: 3600 }).then((r) => r.filas),
   ]);
   const porCod = new Map(lineas.map((l) => [l.cod_linea, l]));
-  return deps.map((d) => {
+  const conLineas = deps.map((d) => {
     const set = new Map<string, Linea>();
     for (const l of lineas) if (l.departamento === d.slug) set.set(l.cod_linea, l);
     for (const e of extra) {
@@ -122,6 +130,7 @@ export const getMenu = cache(async (): Promise<MenuDepartamento[]> => {
     }
     return { ...d, lineas: [...set.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es")) };
   });
+  return conLineas.filter((d) => d.lineas.length > 0);
 });
 
 export async function getLinea(slug: string) {
@@ -171,13 +180,13 @@ export async function listarProductos(opts: {
   filtros: Filtro[];
   pagina?: number;
   orden?: Orden;
-  soloStock?: boolean;
   porPagina?: number;
 }) {
   const porPagina = opts.porPagina ?? POR_PAGINA;
   const pagina = Math.max(1, opts.pagina ?? 1);
   const filtros = [...opts.filtros];
-  if (opts.soloStock) filtros.push({ op: "gt", col: "cant_dispon", val: 0 });
+  // Solo se publican artículos con stock.
+  filtros.push(CON_STOCK);
   const r = await consultar<ProductoResumen>("productos", {
     select: COLS_RESUMEN,
     filtros,
@@ -268,7 +277,7 @@ export async function getProductosPorCodigo(cods: string[]) {
   if (!cods.length) return [];
   const { filas } = await consultar<ProductoResumen>("productos", {
     select: COLS_RESUMEN,
-    filtros: [{ op: "in", col: "cod_articulo", val: cods }],
+    filtros: [{ op: "in", col: "cod_articulo", val: cods }, CON_STOCK],
   });
   const m = new Map(filas.map((p) => [p.cod_articulo, p]));
   return cods.map((c) => m.get(c)).filter((p): p is ProductoResumen => !!p);

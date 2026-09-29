@@ -123,7 +123,9 @@ const productos: Fila[] = [
   prod("FILMSTRECH2K", "Film Strech pre estirado 45 cm x 380 metros 2 kg", 50700, 67, "32", "", ""),
 ];
 
-const tablas: Record<string, Fila[]> = { departamentos, lineas, linea_menu, colecciones, marcas, productos, rubros_negocio, rubro_negocio_linea };
+const lineas_con_stock: Fila[] = lineas.map((l) => ({ cod_linea: l.cod_linea }));
+
+const tablas: Record<string, Fila[]> = { lineas_con_stock, departamentos, lineas, linea_menu, colecciones, marcas, productos, rubros_negocio, rubro_negocio_linea };
 
 function sinTildes(s: string) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();

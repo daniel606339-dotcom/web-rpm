@@ -32,8 +32,8 @@ export default async function Inicio() {
   ]);
 
   const confianza = [
-    { Icono: IconoEscudo, titulo: `${SITE.anios} años · más de 7.000 productos`, texto: "Proveedor de empresas en todo Paraguay" },
-    { Icono: IconoCamion, titulo: "Entrega a domicilio", texto: "Consultá zonas y plazos de entrega" },
+    { Icono: IconoEscudo, titulo: `${SITE.anios} años en el mercado`, texto: "Proveedor de empresas en todo Paraguay" },
+    { Icono: IconoCamion, titulo: "Entrega a domicilio", texto: "Asunción y Gran Asunción en 48 hs · interior 72 hs" },
     { Icono: IconoFactura, titulo: "Factura legal", texto: "A nombre de tu empresa, con tu RUC" },
     { Icono: IconoChat, titulo: "Pedidos por WhatsApp", texto: "Armá tu pedido y te lo confirmamos" },
   ];

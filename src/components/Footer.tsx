@@ -32,7 +32,7 @@ export default function Footer() {
           <ul className="space-y-2">
             <li><Link href="/info/formas-de-entrega" className="hover:text-white">Formas de entrega</Link></li>
             <li><Link href="/info/medios-de-pago" className="hover:text-white">Medios de pago</Link></li>
-            <li><Link href="/info/politicas-de-devolucion" className="hover:text-white">Políticas de devolución</Link></li>
+            <li><Link href="/info/politicas-de-devolucion" className="hover:text-white">Política de devolución</Link></li>
             <li><Link href="/categorias" className="hover:text-white">Todas las categorías</Link></li>
           </ul>
         </div>

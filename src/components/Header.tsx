@@ -49,7 +49,7 @@ export default async function Header() {
               id="q-escritorio"
               name="q"
               type="search"
-              placeholder="Buscá entre más de 7.000 productos, por nombre o código"
+              placeholder="Buscá un producto por nombre, marca o código"
               className="h-full flex-1 bg-transparent text-[15px] outline-none placeholder:text-suave"
             />
             <button type="submit" className="h-9 rounded-lg bg-marca px-4 text-sm font-bold text-white hover:bg-marca-oscuro">

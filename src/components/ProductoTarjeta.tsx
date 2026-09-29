@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ProductoResumen } from "@/lib/data";
 import { SITE } from "@/lib/config";
-import { gs, linkWhatsApp, urlProducto } from "@/lib/format";
+import { disponibles, gs, linkWhatsApp, urlProducto } from "@/lib/format";
 
 export default function ProductoTarjeta({ p, prioridad = false }: { p: ProductoResumen; prioridad?: boolean }) {
   const hayStock = (p.cant_dispon ?? 0) > 0;
@@ -34,7 +34,7 @@ export default function ProductoTarjeta({ p, prioridad = false }: { p: ProductoR
         <span
           className={`w-fit rounded-full px-2 py-0.5 text-xs font-semibold ${hayStock ? "bg-ok/10 text-ok" : "bg-fondo text-suave"}`}
         >
-          {hayStock ? "● En stock" : "Consultar stock"}
+          {hayStock ? `● ${disponibles(p.cant_dispon)}` : "Sin stock"}
         </span>
         <span className="font-titulo text-lg font-extrabold text-texto md:text-xl">{gs(p.precio_venta)}</span>
         <a
