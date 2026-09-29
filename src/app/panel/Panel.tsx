@@ -4,6 +4,7 @@ import { createClient, type Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SUPABASE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
+import { COLUMNAS_EXCEL, hojaPedido } from "@/lib/excelPedido";
 
 const sb = createClient(SUPABASE.url, SUPABASE.key, { db: { schema: "web" } });
 
@@ -222,17 +223,11 @@ function Lista({ email }: { email: string }) {
   );
 }
 
-/** Excel para cargar en el ERP: sin encabezados, código / cantidad / precio, todo como texto. */
+/** Excel para el ERP, mismo formato que el export de Porta (ver lib/excelPedido). */
 async function descargarExcel(p: Pedido) {
   const { default: writeXlsxFile } = await import("write-excel-file/browser");
-  const filas = [...p.pedido_items]
-    .sort((a, b) => a.linea - b.linea)
-    .map((i) => [
-      { type: String, format: "@", value: String(i.cod_articulo) },
-      { type: String, format: "@", value: String(i.cantidad) },
-      { type: String, format: "@", value: String(i.precio) },
-    ]);
-  await writeXlsxFile(filas, { columns: [{ width: 18 }, { width: 10 }, { width: 12 }] }).toFile(`${p.numero}.xlsx`);
+  const items = [...p.pedido_items].sort((a, b) => a.linea - b.linea);
+  await writeXlsxFile(hojaPedido(items), { sheet: p.numero, columns: COLUMNAS_EXCEL }).toFile(`${p.numero}.xlsx`);
 }
 
 function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido, "estado" | "nota_interna">>) => void }) {
