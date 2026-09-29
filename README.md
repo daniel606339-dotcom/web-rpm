@@ -18,6 +18,7 @@ Sitio de Distribuidora RPM (reemplazo de Porta). Next.js 16 + Supabase (esquema 
 
 | Variable | Dónde | Valor |
 |---|---|---|
+| `RPM_INDEXAR` | **solo al pasar al dominio real** | `1` (antes de eso Google no indexa nada, ni web-rpm.vercel.app) |
 | `NEXT_PUBLIC_SITE_URL` | Production | `https://www.distribuidorarpm.com.py` |
 | `NEXT_PUBLIC_WHATSAPP` | todas (opcional) | `595976634184` |
 | `NEXT_PUBLIC_GTM_ID` | **solo Production** | `GTM-NWJ3WCN` (no cargar en pruebas: contaría conversiones falsas) |

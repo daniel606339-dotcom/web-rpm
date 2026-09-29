@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/config";
 
 export default function robots(): MetadataRoute.Robots {
-  // Solo el sitio de producción se deja indexar; las direcciones de prueba no.
-  if (process.env.VERCEL_ENV !== "production") {
+  // Hasta pasar al dominio real (RPM_INDEXAR=1) no se deja indexar nada, ni web-rpm.vercel.app.
+  if (process.env.RPM_INDEXAR !== "1") {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
   return {

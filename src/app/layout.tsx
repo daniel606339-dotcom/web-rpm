@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   },
   description: SITE.descripcion,
   openGraph: { siteName: SITE.nombre, locale: "es_PY", type: "website" },
-  // En la dirección de prueba no queremos que Google indexe nada.
-  robots: process.env.VERCEL_ENV === "production" ? undefined : { index: false, follow: false },
+  // Solo se indexa cuando RPM_INDEXAR=1 (se activa al pasar al dominio real).
+  robots: process.env.RPM_INDEXAR === "1" ? undefined : { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
