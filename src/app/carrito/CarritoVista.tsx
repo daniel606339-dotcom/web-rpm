@@ -84,21 +84,25 @@ export default function CarritoVista() {
           </div>
         )}
         <div className="flex items-baseline justify-between">
-          <span className="text-suave">Total</span>
+          <span className="text-suave">Subtotal</span>
           <span className="text-2xl font-extrabold text-marca">{gs(total)}</span>
         </div>
+        <p className="-mt-2 text-xs text-suave">El envío se calcula según tu ciudad en el siguiente paso.</p>
+        <Link
+          href="/checkout"
+          className="flex h-12 items-center justify-center rounded-lg bg-acento font-bold text-white hover:bg-acento-oscuro"
+        >
+          Finalizar compra
+        </Link>
+        <p className="text-center text-xs text-suave">Sin crear cuenta · Pago por transferencia</p>
         <a
           href={linkWhatsApp(SITE.whatsapp, mensaje)}
           target="_blank"
           rel="noopener"
-          className="flex h-12 items-center justify-center gap-2 rounded-lg bg-[#25d366] font-bold text-white hover:brightness-95"
+          className="flex h-11 items-center justify-center gap-2 rounded-lg border-2 border-[#25d366] text-sm font-bold text-[#128c4a] hover:bg-[#25d366]/10"
         >
-          <IconoWhatsApp className="size-5" /> Enviar pedido por WhatsApp
+          <IconoWhatsApp className="size-5" /> O enviar el pedido por WhatsApp
         </a>
-        <button disabled className="h-12 w-full cursor-not-allowed rounded-lg bg-acento/40 font-bold text-white" title="Próximamente">
-          Pagar online (próximamente)
-        </button>
-        <p className="text-xs text-suave">Precios sujetos a confirmación de stock. Un vendedor te confirma el pedido y la entrega.</p>
         <button onClick={vaciar} className="text-xs text-suave underline">
           Vaciar carrito
         </button>

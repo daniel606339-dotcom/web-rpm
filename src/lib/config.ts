@@ -16,6 +16,19 @@ export const SITE = {
   moneda: "PYG",
 };
 
+/** Datos para transferencia (los mismos que publica Porta hoy). */
+export const BANCO = {
+  banco: "Banco Continental S.A.E.C.A.",
+  alias: "RUC 80122009-2",
+  cuenta: "34-23106000-03",
+  tipo: "Cuenta corriente en guaraníes",
+  razonSocial: "DISTRIBUIDORA RPM S.A.",
+  ruc: "80122009-2",
+  emailComprobante: "rcaballero@distribuidorarpm.com.py",
+};
+
+export const HORARIO_ENTREGA = ["Lunes a viernes: 09:00 a 17:00", "Sábados: 09:00 a 12:00"];
+
 export const SUPABASE = {
   url: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://yrvunjrqxowuraezggdh.supabase.co",
   // Clave publicable (solo lectura, protegida por RLS). No es secreta.

@@ -125,7 +125,14 @@ const productos: Fila[] = [
 
 const lineas_con_stock: Fila[] = lineas.map((l) => ({ cod_linea: l.cod_linea }));
 
-const tablas: Record<string, Fila[]> = { lineas_con_stock, departamentos, lineas, linea_menu, colecciones, marcas, productos, rubros_negocio, rubro_negocio_linea };
+const localidades: Fila[] = [
+  { id: 1, nombre: "Asunción", costo_envio: 20000, tipo: "envio" },
+  { id: 3, nombre: "Luque", costo_envio: 25000, tipo: "envio" },
+  { id: 19, nombre: "Interior del país (cobro a destino)", costo_envio: 0, tipo: "interior" },
+  { id: 21, nombre: "Retiro en Centro de Distribución", costo_envio: 0, tipo: "retiro" },
+];
+
+const tablas: Record<string, Fila[]> = { lineas_con_stock, localidades, departamentos, lineas, linea_menu, colecciones, marcas, productos, rubros_negocio, rubro_negocio_linea };
 
 function sinTildes(s: string) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
