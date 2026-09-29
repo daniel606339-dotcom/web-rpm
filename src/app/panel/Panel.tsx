@@ -4,7 +4,7 @@ import { createClient, type Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SUPABASE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
-import { COLUMNAS_EXCEL, hojaPedido } from "@/lib/excelPedido";
+import { excelPedido } from "@/lib/excelPedido";
 
 const sb = createClient(SUPABASE.url, SUPABASE.key, { db: { schema: "web" } });
 
@@ -223,11 +223,16 @@ function Lista({ email }: { email: string }) {
   );
 }
 
-/** Excel para el ERP, mismo formato que el export de Porta (ver lib/excelPedido). */
-async function descargarExcel(p: Pedido) {
-  const { default: writeXlsxFile } = await import("write-excel-file/browser");
+/** Excel para el ERP, con la misma estructura que el export de Porta (ver lib/excelPedido). */
+function descargarExcel(p: Pedido) {
   const items = [...p.pedido_items].sort((a, b) => a.linea - b.linea);
-  await writeXlsxFile(hojaPedido(items), { sheet: p.numero, columns: COLUMNAS_EXCEL }).toFile(`${p.numero}.xlsx`);
+  const datos = excelPedido(p.numero, items);
+  const url = URL.createObjectURL(new Blob([datos as BlobPart], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${p.numero}.xlsx`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido, "estado" | "nota_interna">>) => void }) {
@@ -270,7 +275,7 @@ function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido
         </table>
         {p.observaciones && <p className="mt-3 rounded-lg bg-white p-3 text-sm"><b>Observaciones del cliente:</b> {p.observaciones}</p>}
         <button
-          onClick={() => descargarExcel(p).catch(() => alert("No se pudo generar el Excel."))}
+          onClick={() => descargarExcel(p)}
           className="mt-3 flex h-10 items-center gap-2 rounded-lg border-[1.5px] border-ok px-4 text-sm font-bold text-ok hover:bg-ok/10"
         >
           ⬇ Descargar Excel para el ERP ({p.numero}.xlsx)

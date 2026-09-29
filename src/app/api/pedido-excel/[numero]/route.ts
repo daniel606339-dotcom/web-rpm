@@ -1,6 +1,5 @@
-import writeXlsxFile from "write-excel-file/node";
 import { SUPABASE } from "@/lib/config";
-import { COLUMNAS_EXCEL, hojaPedido, type ItemExcel } from "@/lib/excelPedido";
+import { excelPedido, type ItemExcel } from "@/lib/excelPedido";
 
 /**
  * GET /api/pedido-excel/W000001?t=<excel_token>
@@ -31,8 +30,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ numero: string 
   const items = (await res.json()) as ItemExcel[];
   if (!items.length) return new Response("No encontrado", { status: 404 });
 
-  const buffer = await writeXlsxFile(hojaPedido(items), { sheet: numero, columns: COLUMNAS_EXCEL }).toBuffer();
-  return new Response(new Uint8Array(buffer), {
+  return new Response(excelPedido(numero, items) as BodyInit, {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "Content-Disposition": `attachment; filename="${numero}.xlsx"`,
