@@ -98,6 +98,7 @@ export default async function PaginaProducto({ params }: Props) {
                 url={url}
                 whatsapp={SITE.whatsapp}
                 hayStock={hayStock}
+                stock={Math.floor(p.cant_dispon ?? 0)}
               />
             </div>
           </div>

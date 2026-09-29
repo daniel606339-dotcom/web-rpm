@@ -9,6 +9,8 @@ export interface ItemCarrito {
   foto: string | null;
   url: string;
   cantidad: number;
+  /** Stock disponible cuando se agregó (tope de cantidad). */
+  stock?: number;
 }
 
 const CLAVE = "rpm-carrito-v1";
@@ -56,18 +58,29 @@ export function useCarrito() {
   return useSyncExternalStore(suscribir, leer, () => vacio);
 }
 
+const tope = (stock: number | undefined, n: number) => (stock != null && stock >= 0 ? Math.min(n, stock) : n);
+
+/** Agrega al carrito sin pasar el stock. Devuelve la cantidad que quedó en el carrito. */
 export function agregar(item: Omit<ItemCarrito, "cantidad">, cantidad: number) {
   const items = [...leer()];
   const i = items.findIndex((x) => x.cod === item.cod);
-  if (i >= 0) items[i] = { ...items[i], ...item, cantidad: items[i].cantidad + cantidad };
-  else items.push({ ...item, cantidad });
+  let final: number;
+  if (i >= 0) {
+    const stock = item.stock ?? items[i].stock;
+    final = tope(stock, items[i].cantidad + cantidad);
+    items[i] = { ...items[i], ...item, stock, cantidad: final };
+  } else {
+    final = tope(item.stock, cantidad);
+    items.push({ ...item, cantidad: final });
+  }
   guardar(items);
+  return final;
 }
 
 export function cambiarCantidad(cod: string, cantidad: number) {
   guardar(
     leer()
-      .map((x) => (x.cod === cod ? { ...x, cantidad } : x))
+      .map((x) => (x.cod === cod ? { ...x, cantidad: tope(x.stock, cantidad) } : x))
       .filter((x) => x.cantidad > 0),
   );
 }

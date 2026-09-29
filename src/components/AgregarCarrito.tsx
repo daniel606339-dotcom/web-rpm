@@ -14,13 +14,22 @@ interface Props {
   url: string;
   whatsapp: string;
   hayStock: boolean;
+  /** Stock disponible: no se puede agregar más que esto. */
+  stock: number;
 }
 
-export default function AgregarCarrito({ cod, nombre, precio, foto, url, whatsapp, hayStock }: Props) {
-  const [cantidad, setCantidad] = useState(1);
-  const [agregado, setAgregado] = useState(false);
+export default function AgregarCarrito({ cod, nombre, precio, foto, url, whatsapp, hayStock, stock }: Props) {
+  const [cantidad, setCantidadLibre] = useState(1);
+  const [aviso, setAviso] = useState<{ tipo: "ok" | "tope"; texto: string } | null>(null);
   const items = useCarrito();
   const enCarrito = items.find((x) => x.cod === cod)?.cantidad ?? 0;
+  // Lo máximo que todavía se puede sumar sin pasar el stock
+  const restante = Math.max(0, stock - enCarrito);
+  const setCantidad = (f: number | ((c: number) => number)) =>
+    setCantidadLibre((c) => {
+      const n = typeof f === "function" ? f(c) : f;
+      return Math.max(1, Math.min(n, Math.max(1, restante)));
+    });
 
   const mensaje = `Hola RPM, quiero pedir:\n${cantidad} x ${nombre} (cód. ${cod})${precio ? ` – ${gs(precio)} c/u` : ""}`;
 
@@ -46,15 +55,28 @@ export default function AgregarCarrito({ cod, nombre, precio, foto, url, whatsap
             className="h-12 w-14 border-x border-borde text-center font-semibold outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
             aria-label="Cantidad"
           />
-          <button type="button" className="h-12 w-11 text-xl text-marca" onClick={() => setCantidad((c) => c + 1)} aria-label="Sumar uno">
+          <button
+            type="button"
+            className="h-12 w-11 text-xl text-marca disabled:opacity-30"
+            onClick={() => setCantidad((c) => c + 1)}
+            disabled={cantidad >= restante}
+            aria-label="Sumar uno"
+          >
             +
           </button>
         </div>
         <button
           type="button"
+          disabled={restante <= 0}
           onClick={() => {
-            agregar({ cod, nombre, precio, foto, url }, cantidad);
-            setAgregado(true);
+            const pedido = Math.min(cantidad, restante);
+            const quedo = agregar({ cod, nombre, precio, foto, url, stock }, pedido);
+            setCantidadLibre(1);
+            setAviso(
+              quedo >= stock
+                ? { tipo: "tope", texto: `Tenés ${quedo} en el carrito: es todo el stock disponible.` }
+                : { tipo: "ok", texto: `Agregado. Tenés ${quedo} en el carrito.` },
+            );
             // Evento para Google Tag Manager / Ads
             const w = window as unknown as { dataLayer?: unknown[] };
             w.dataLayer?.push({
@@ -62,15 +84,19 @@ export default function AgregarCarrito({ cod, nombre, precio, foto, url, whatsap
               ecommerce: { currency: "PYG", value: (precio ?? 0) * cantidad, items: [{ item_id: cod, item_name: nombre, price: precio, quantity: cantidad }] },
             });
           }}
-          className="h-12 flex-1 rounded-lg bg-acento px-5 font-bold text-white shadow-sm hover:bg-acento-oscuro"
+          className="h-12 flex-1 rounded-lg bg-acento px-5 font-bold text-white shadow-sm hover:bg-acento-oscuro disabled:cursor-not-allowed disabled:bg-acento/40"
         >
-          Agregar al carrito
+          {restante <= 0 ? "Ya tenés todo el stock" : "Agregar al carrito"}
         </button>
       </div>
+      {stock > 0 && <p className="-mt-1 text-xs text-suave">Podés pedir hasta {stock.toLocaleString("es-PY")} unidades.</p>}
 
-      {agregado && (
-        <p className="flex items-center justify-between rounded-lg bg-ok/10 px-3 py-2 text-sm text-ok" role="status">
-          <span>Agregado. Tenés {enCarrito} en el carrito.</span>
+      {aviso && (
+        <p
+          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${aviso.tipo === "ok" ? "bg-ok/10 text-ok" : "bg-[#fff4ee] text-[#8a2e00]"}`}
+          role="status"
+        >
+          <span>{aviso.texto}</span>
           <Link href="/carrito" className="font-semibold underline">
             Ver carrito
           </Link>

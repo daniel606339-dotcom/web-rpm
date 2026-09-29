@@ -52,6 +52,19 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
   const [faltan, setFaltan] = useState<Resultado["faltan"]>();
   const [hecho, setHecho] = useState<Resultado | null>(null);
 
+  const retiro = localidades.find((l) => l.tipo === "retiro");
+  const zonas = localidades.filter((l) => l.tipo !== "retiro");
+  const [modo, setModo] = useState<"delivery" | "retiro">("delivery");
+  const [zonaElegida, setZonaElegida] = useState("");
+  function cambiarModo(m: "delivery" | "retiro") {
+    setModo(m);
+    if (m === "retiro") {
+      setZonaElegida(f.localidad_id);
+      setF((x) => ({ ...x, localidad_id: retiro ? String(retiro.id) : "" }));
+    } else {
+      setF((x) => ({ ...x, localidad_id: zonaElegida }));
+    }
+  }
   const loc = localidades.find((l) => String(l.id) === f.localidad_id);
   const envio = loc?.costo_envio ?? 0;
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -145,7 +158,10 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
           <p className="text-sm font-semibold text-ok">✓ Pedido recibido</p>
           <h2 className="mt-1 text-2xl font-bold">Tu número de pedido es {hecho.numero}</h2>
           <p className="mt-2 text-suave">
-            Te vamos a contactar para confirmar la disponibilidad y la entrega. Total: <b className="text-texto">{gs(hecho.total)}</b>
+            {hecho.tipo === "retiro"
+              ? "Tu pedido va a estar listo para retirar en 2 horas en 12 de Octubre N° 521 (Barrio Pinozá, Asunción), dentro del horario de atención. Te avisamos por WhatsApp cuando esté preparado."
+              : "Te vamos a contactar para confirmar la disponibilidad y la entrega."}{" "}
+            Total: <b className="text-texto">{gs(hecho.total)}</b>
             {hecho.costo_envio ? ` (incluye envío ${gs(hecho.costo_envio)})` : ""}.
           </p>
         </div>
@@ -225,19 +241,72 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
         <section className="rounded-2xl border border-borde bg-white p-4 md:p-6">
           <h2 className="mb-4 text-lg font-bold">Entrega</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="md:col-span-2">
-              <span className={etiqueta}>Ciudad *</span>
-              <select required value={f.localidad_id} onChange={set("localidad_id")} className={campo}>
-                <option value="">Elegí tu ciudad</option>
-                {localidades.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.nombre}
-                    {l.tipo === "envio" ? ` — envío ${gs(l.costo_envio)}` : l.tipo === "retiro" ? " — sin costo" : ""}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {loc?.tipo !== "retiro" && (
+            {/* Delivery o retiro: dos opciones visibles, delivery por defecto */}
+            <div className="grid grid-cols-2 gap-2 md:col-span-2" role="radiogroup" aria-label="Forma de entrega">
+              {(
+                [
+                  ["delivery", "Delivery", "Te lo llevamos"],
+                  ["retiro", "Pasar a retirar", "Pickup en nuestro depósito, sin costo"],
+                ] as const
+              ).map(([valor, titulo, sub]) => (
+                <label
+                  key={valor}
+                  className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-3 transition ${
+                    modo === valor ? "border-marca bg-marca-suave/40" : "border-borde hover:border-marca/40"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="modo"
+                    value={valor}
+                    checked={modo === valor}
+                    onChange={() => cambiarModo(valor)}
+                    className="mt-1 size-4 accent-[var(--color-marca)]"
+                  />
+                  <span>
+                    <span className="block font-semibold">{titulo}</span>
+                    <span className="text-xs text-suave md:text-sm">{sub}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            {modo === "retiro" && retiro && (
+              <div className="space-y-2 rounded-xl bg-fondo p-4 text-sm md:col-span-2">
+                <p className="font-semibold text-titulo">Retirás en nuestro Centro de Distribución</p>
+                <p>{SITE.direccion.replace("Barrio Pinozá", "entre 14 de Junio e Igualdad, Barrio Pinozá")}</p>
+                <p>
+                  <a
+                    className="font-semibold text-marca underline"
+                    target="_blank"
+                    rel="noopener"
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("12 de Octubre 521, Asunción, Paraguay")}`}
+                  >
+                    Cómo llegar
+                  </a>
+                </p>
+                <p className="rounded-lg bg-white p-3">
+                  ⏱ Tu pedido va a estar <b>listo para retirar en 2 horas</b> desde la confirmación, dentro del horario de atención:{" "}
+                  {HORARIO_ENTREGA.join(" · ")}. Te avisamos por WhatsApp cuando esté preparado.
+                </p>
+              </div>
+            )}
+
+            {modo === "delivery" && (
+              <label className="md:col-span-2">
+                <span className={etiqueta}>Ciudad o zona *</span>
+                <select required value={f.localidad_id} onChange={set("localidad_id")} className={campo}>
+                  <option value="">Elegí tu ciudad</option>
+                  {zonas.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.nombre}
+                      {l.tipo === "envio" ? ` — envío ${gs(l.costo_envio)}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {modo === "delivery" && (
               <>
                 <label className="md:col-span-2">
                   <span className={etiqueta}>Dirección *</span>
@@ -297,9 +366,11 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
                 Envíos al interior por transportadora, con cobro a destino. Indicá en observaciones tu transportadora de preferencia.
               </p>
             )}
-            <div className="text-sm text-suave md:col-span-2">
-              Las entregas se realizan dentro de las 24 a 48 horas posteriores a la confirmación: {HORARIO_ENTREGA.join(" · ")}.
-            </div>
+            {modo === "delivery" && (
+              <div className="text-sm text-suave md:col-span-2">
+                Las entregas se realizan dentro de las 24 a 48 horas posteriores a la confirmación: {HORARIO_ENTREGA.join(" · ")}.
+              </div>
+            )}
             <label className="md:col-span-2">
               <span className={etiqueta}>Observaciones</span>
               <textarea rows={3} maxLength={1000} value={f.observaciones} onChange={set("observaciones")} className={`${campo} h-auto py-3`} />

@@ -50,10 +50,16 @@ export default function CarritoVista() {
                     −
                   </button>
                   <span className="w-10 text-center text-sm font-semibold">{x.cantidad}</span>
-                  <button className="h-9 w-9 text-lg text-marca" onClick={() => cambiarCantidad(x.cod, x.cantidad + 1)} aria-label="Sumar uno">
+                  <button
+                    className="h-9 w-9 text-lg text-marca disabled:opacity-30"
+                    onClick={() => cambiarCantidad(x.cod, x.cantidad + 1)}
+                    disabled={x.stock != null && x.cantidad >= x.stock}
+                    aria-label="Sumar uno"
+                  >
                     +
                   </button>
                 </div>
+                {x.stock != null && x.cantidad >= x.stock && <span className="text-xs text-[#8a2e00]">Máximo disponible</span>}
                 <div className="text-right">
                   <div className="font-bold">{gs((x.precio ?? 0) * x.cantidad)}</div>
                   <button onClick={() => quitar(x.cod)} className="text-xs text-suave underline hover:text-acento">
