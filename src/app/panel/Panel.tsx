@@ -222,6 +222,19 @@ function Lista({ email }: { email: string }) {
   );
 }
 
+/** Excel para cargar en el ERP: sin encabezados, código / cantidad / precio, todo como texto. */
+async function descargarExcel(p: Pedido) {
+  const { default: writeXlsxFile } = await import("write-excel-file/browser");
+  const filas = [...p.pedido_items]
+    .sort((a, b) => a.linea - b.linea)
+    .map((i) => [
+      { type: String, format: "@", value: String(i.cod_articulo) },
+      { type: String, format: "@", value: String(i.cantidad) },
+      { type: String, format: "@", value: String(i.precio) },
+    ]);
+  await writeXlsxFile(filas, { columns: [{ width: 18 }, { width: 10 }, { width: 12 }] }).toFile(`${p.numero}.xlsx`);
+}
+
 function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido, "estado" | "nota_interna">>) => void }) {
   const [nota, setNota] = useState(p.nota_interna ?? "");
   const items = [...p.pedido_items].sort((a, b) => a.linea - b.linea);
@@ -261,6 +274,12 @@ function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido
           </tfoot>
         </table>
         {p.observaciones && <p className="mt-3 rounded-lg bg-white p-3 text-sm"><b>Observaciones del cliente:</b> {p.observaciones}</p>}
+        <button
+          onClick={() => descargarExcel(p).catch(() => alert("No se pudo generar el Excel."))}
+          className="mt-3 flex h-10 items-center gap-2 rounded-lg border-[1.5px] border-ok px-4 text-sm font-bold text-ok hover:bg-ok/10"
+        >
+          ⬇ Descargar Excel para el ERP ({p.numero}.xlsx)
+        </button>
       </div>
       <div className="space-y-3 text-sm">
         <div className="rounded-lg bg-white p-3 leading-relaxed">
