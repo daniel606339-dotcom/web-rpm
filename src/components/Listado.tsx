@@ -42,12 +42,10 @@ export default function Listado({ filas, total, pagina, paginas, orden, base, ex
       {filas.length === 0 ? (
         <p className="rounded-xl border border-borde bg-white p-8 text-center text-suave">No encontramos productos.</p>
       ) : (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
           {filas.map((p, i) => (
             <li key={p.cod_articulo} className="flex">
-              <div className="flex w-full">
-                <ProductoTarjeta p={p} prioridad={i < 4} />
-              </div>
+              <ProductoTarjeta p={p} prioridad={i < 4} />
             </li>
           ))}
         </ul>

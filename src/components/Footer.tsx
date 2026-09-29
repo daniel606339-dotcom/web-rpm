@@ -1,60 +1,51 @@
 import Link from "next/link";
-import { getDepartamentos } from "@/lib/data";
 import { SITE } from "@/lib/config";
 import { linkWhatsApp } from "@/lib/format";
 import Logo from "./Logo";
 
-export default async function Footer() {
-  const deps = await getDepartamentos();
+export default function Footer() {
   return (
-    <footer className="mt-12 bg-marca-oscuro text-white/80">
+    <footer className="mt-12 bg-marca-oscuro text-[15px] text-white/85">
       <div className="contenedor grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo />
-          <p className="mt-3 text-sm">{SITE.descripcion}</p>
+          <Logo sobreOscuro />
+          <p className="mt-3">{SITE.anios} años distribuyendo en Paraguay</p>
         </div>
         <div>
-          <h2 className="mb-3 font-semibold text-white">Categorías</h2>
-          <ul className="space-y-1.5 text-sm">
-            {deps.map((d) => (
-              <li key={d.slug}>
-                <Link href={`/d/${d.slug}`} className="hover:text-white">
-                  {d.nombre}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h2 className="mb-3 font-semibold text-white">Empresas</h2>
-          <ul className="space-y-1.5 text-sm">
+          <h2 className="mb-3 text-[15px] font-bold !text-white">Contacto</h2>
+          <ul className="space-y-2">
+            <li>{SITE.direccion}</li>
             <li>
-              <a href={linkWhatsApp(SITE.whatsapp, "Hola RPM, quiero pedir un presupuesto para mi empresa.")} className="hover:text-white">
-                Pedir presupuesto
+              <a href={`mailto:${SITE.email}`} className="hover:text-white">
+                {SITE.email}
               </a>
             </li>
             <li>
-              <Link href="/buscar" className="hover:text-white">
-                Catálogo completo
-              </Link>
+              <a href={linkWhatsApp(SITE.whatsapp, "Hola RPM")} target="_blank" rel="noopener" className="hover:text-white">
+                WhatsApp {SITE.whatsappVisible}
+              </a>
             </li>
           </ul>
         </div>
         <div>
-          <h2 className="mb-3 font-semibold text-white">Contacto</h2>
-          <ul className="space-y-1.5 text-sm">
-            <li>
-              <a href={linkWhatsApp(SITE.whatsapp, "Hola RPM")} className="hover:text-white">
-                WhatsApp +{SITE.whatsapp}
-              </a>
-            </li>
-            <li>{SITE.ciudad}, Paraguay</li>
+          <h2 className="mb-3 text-[15px] font-bold !text-white">Comprar</h2>
+          <ul className="space-y-2">
+            <li><Link href="/info/formas-de-entrega" className="hover:text-white">Formas de entrega</Link></li>
+            <li><Link href="/info/medios-de-pago" className="hover:text-white">Medios de pago</Link></li>
+            <li><Link href="/info/politicas-de-devolucion" className="hover:text-white">Políticas de devolución</Link></li>
+            <li><Link href="/categorias" className="hover:text-white">Todas las categorías</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h2 className="mb-3 text-[15px] font-bold !text-white">Empresa</h2>
+          <ul className="space-y-2">
+            <li><Link href="/info/nosotros" className="hover:text-white">Nosotros</Link></li>
+            <li><Link href="/empresas" className="hover:text-white">Portal para empresas</Link></li>
+            <li><Link href="/info/trabaja-con-nosotros" className="hover:text-white">Trabajá con nosotros</Link></li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">
-        © {new Date().getFullYear()} Distribuidora RPM S.A.
-      </div>
+      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">© {new Date().getFullYear()} Distribuidora RPM S.A.</div>
     </footer>
   );
 }

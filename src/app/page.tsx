@@ -1,91 +1,193 @@
+import Image from "next/image";
 import Link from "next/link";
-import { getMenu, getLineas, listarProductos } from "@/lib/data";
+import { getCategoriaConFoto, getMenu, getProductosPorCodigo, getRubros } from "@/lib/data";
 import { SITE } from "@/lib/config";
+import { BANNERS, CATEGORIAS_BUSCADAS, LO_MAS_PEDIDO } from "@/lib/inicio";
 import { linkWhatsApp } from "@/lib/format";
+import Carrusel from "@/components/Carrusel";
 import ProductoTarjeta from "@/components/ProductoTarjeta";
-import Banners from "@/components/Banners";
+import { IconoCamion, IconoChat, IconoDepartamento, IconoEscudo, IconoFactura, IconoRubro } from "@/components/iconos";
 
 export const revalidate = 900;
 
-// Líneas que se muestran como filas en el inicio (por slug). Editar a gusto.
-const LINEAS_INICIO = ["resmas", "boligrafos", "detergentes", "film-plasticos"];
+function Titulo({ children, href, texto }: { children: React.ReactNode; href?: string; texto?: string }) {
+  return (
+    <div className="mb-3 flex items-baseline justify-between gap-4 md:mb-4">
+      <h2 className="text-lg font-bold md:text-2xl">{children}</h2>
+      {href && (
+        <Link href={href} className="shrink-0 text-[13px] font-semibold text-marca underline underline-offset-2 md:text-sm">
+          {texto}
+        </Link>
+      )}
+    </div>
+  );
+}
 
 export default async function Inicio() {
-  const [menu, lineas] = await Promise.all([getMenu(), getLineas()]);
-  const filas = await Promise.all(
-    LINEAS_INICIO.map(async (slug) => {
-      const l = lineas.find((x) => x.slug === slug);
-      if (!l) return null;
-      const r = await listarProductos({ filtros: [{ op: "eq", col: "cod_linea", val: l.cod_linea }], soloStock: true, porPagina: 10 });
-      return r.filas.length ? { linea: l, productos: r.filas } : null;
-    }),
-  );
+  const [menu, rubros, categorias, masPedido] = await Promise.all([
+    getMenu(),
+    getRubros(),
+    Promise.all(CATEGORIAS_BUSCADAS.map(getCategoriaConFoto)),
+    getProductosPorCodigo(LO_MAS_PEDIDO),
+  ]);
+
+  const confianza = [
+    { Icono: IconoEscudo, titulo: `${SITE.anios} años · más de 7.000 productos`, texto: "Proveedor de empresas en todo Paraguay" },
+    { Icono: IconoCamion, titulo: "Entrega a domicilio", texto: "Consultá zonas y plazos de entrega" },
+    { Icono: IconoFactura, titulo: "Factura legal", texto: "A nombre de tu empresa, con tu RUC" },
+    { Icono: IconoChat, titulo: "Pedidos por WhatsApp", texto: "Armá tu pedido y te lo confirmamos" },
+  ];
 
   return (
-    <>
-      <Banners />
+    <div className="pb-4">
+      <div className="contenedor mt-3 md:mt-5">
+        <Carrusel banners={BANNERS} />
+      </div>
 
-      <section className="contenedor mt-8">
-        <h2 className="mb-4 text-xl font-bold md:text-2xl">Comprá por departamento</h2>
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {menu.map((d) => (
+      {/* Confianza (escritorio) */}
+      <ul className="contenedor mt-6 hidden grid-cols-4 gap-4 md:grid">
+        {confianza.map(({ Icono, titulo, texto }) => (
+          <li key={titulo} className="flex items-start gap-3 rounded-xl border border-borde bg-white px-4 py-3.5">
+            <Icono className="mt-0.5 size-5 shrink-0 text-marca" />
+            <div>
+              <p className="text-[15px] font-bold leading-tight text-titulo">{titulo}</p>
+              <p className="text-[13px] text-suave">{texto}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {/* Departamentos (celular) */}
+      <nav aria-label="Departamentos" className="contenedor mt-5 md:hidden">
+        <ul className="grid grid-cols-4 gap-x-2 gap-y-4">
+          {menu.slice(0, 7).map((d) => (
             <li key={d.slug}>
-              <Link
-                href={`/d/${d.slug}`}
-                className="flex h-full flex-col justify-between rounded-xl border border-borde bg-white p-4 transition hover:border-marca hover:shadow-md"
-              >
-                <span className="font-semibold text-marca">{d.nombre}</span>
-                <span className="mt-2 line-clamp-2 text-xs text-suave">
-                  {d.lineas
-                    .slice(0, 4)
-                    .map((l) => l.nombre)
-                    .join(" · ")}
+              <Link href={`/d/${d.slug}`} className="flex flex-col items-center gap-1.5 text-center text-[13px] font-semibold leading-tight">
+                <span className="flex size-14 items-center justify-center rounded-2xl bg-marca-suave text-marca">
+                  <IconoDepartamento slug={d.slug} />
                 </span>
+                {d.nombre.replace("Alimentos y bebidas", "Cafetería").replace("Mantenimiento integral", "Mantenimiento")}
               </Link>
             </li>
           ))}
+          <li>
+            <Link href="/categorias" className="flex flex-col items-center gap-1.5 text-[13px] font-semibold">
+              <span className="flex size-14 items-center justify-center rounded-2xl bg-marca-suave text-marca">
+                <IconoDepartamento slug="todo" />
+              </span>
+              Ver todo
+            </Link>
+          </li>
+        </ul>
+      </nav>
+
+      {/* Tipo de negocio */}
+      {rubros.length > 0 && (
+        <section className="contenedor mt-7 md:mt-10">
+          <Titulo href="/rubro" texto="Ver todos los rubros">
+            Comprá por tipo de negocio
+          </Titulo>
+          <p className="-mt-2 mb-4 hidden text-suave md:block">Lo que usa tu empresa todos los meses, en un solo lugar</p>
+          {/* celular: chips */}
+          <ul className="flex flex-wrap gap-2 md:hidden">
+            {rubros.map((r) => (
+              <li key={r.slug}>
+                <Link href={`/rubro/${r.slug}`} className="block rounded-full border border-[#c9cedb] px-3.5 py-2.5 text-sm font-semibold">
+                  {r.nombre.split(" y ")[0]}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {/* escritorio: tarjetas */}
+          <ul className="hidden grid-cols-3 gap-4 md:grid">
+            {rubros.map((r) => (
+              <li key={r.slug}>
+                <Link
+                  href={`/rubro/${r.slug}`}
+                  className="flex h-full items-start gap-4 rounded-xl border border-borde bg-white p-4 transition hover:border-marca hover:shadow-md"
+                >
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-marca-suave text-marca">
+                    <IconoRubro slug={r.slug} />
+                  </span>
+                  <span>
+                    <span className="block font-bold text-titulo">{r.nombre}</span>
+                    <span className="mt-1 block text-sm leading-snug text-suave">{r.descripcion}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Categorías más buscadas */}
+      <section className="contenedor mt-7 md:mt-10">
+        <Titulo href="/categorias" texto="Ver todas">
+          Categorías más buscadas
+        </Titulo>
+        <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
+          {categorias.map(
+            (c) =>
+              c && (
+                <li key={c.slug}>
+                  <Link
+                    href={`/c/${c.slug}`}
+                    className="flex h-full items-center gap-3 rounded-xl border border-borde bg-white p-2.5 transition hover:border-marca hover:shadow-md"
+                  >
+                    <span className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-[#f3f4f7] md:size-14">
+                      {c.foto && <Image src={c.foto} alt="" fill sizes="56px" className="object-contain p-1" />}
+                    </span>
+                    <span className="text-sm font-bold text-titulo md:text-[15px]">{c.nombre}</span>
+                  </Link>
+                </li>
+              ),
+          )}
         </ul>
       </section>
 
-      {filas.map(
-        (f) =>
-          f && (
-            <section key={f.linea.slug} className="contenedor mt-10">
-              <div className="mb-4 flex items-baseline justify-between">
-                <h2 className="text-xl font-bold md:text-2xl">{f.linea.nombre}</h2>
-                <Link href={`/c/${f.linea.slug}`} className="text-sm font-semibold text-marca hover:underline">
-                  Ver todos
-                </Link>
-              </div>
-              <ul className="scroll-x -mx-4 flex gap-3 px-4 pb-2 lg:mx-0 lg:grid lg:grid-cols-5 lg:px-0">
-                {f.productos.map((p) => (
-                  <li key={p.cod_articulo} className="flex w-44 shrink-0 lg:w-auto">
-                    <ProductoTarjeta p={p} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ),
+      {/* Lo más pedido */}
+      {masPedido.length > 0 && (
+        <section className="contenedor mt-7 md:mt-10">
+          <Titulo href="/buscar" texto="Ver más productos">
+            Lo más pedido
+          </Titulo>
+          <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
+            {masPedido.map((p) => (
+              <li key={p.cod_articulo} className="flex">
+                <ProductoTarjeta p={p} />
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
-      <section className="contenedor mt-12">
-        <div className="grid items-center gap-6 rounded-2xl bg-marca p-6 text-white md:grid-cols-[1fr_auto] md:p-10">
+      {/* Empresas */}
+      <section className="contenedor mt-8 md:mt-12">
+        <div className="flex flex-col gap-4 rounded-[14px] bg-marca p-4 text-white md:flex-row md:items-center md:justify-between md:rounded-2xl md:px-9 md:py-8">
           <div>
-            <h2 className="text-2xl font-bold md:text-3xl">¿Comprás para tu empresa?</h2>
-            <p className="mt-2 max-w-xl text-white/80">
-              Mandanos tu lista y te preparamos un presupuesto con precios por volumen, factura legal y entrega programada.
+            <h2 className="text-lg font-bold !text-white md:text-2xl">¿Comprás para tu empresa?</h2>
+            <p className="mt-1 text-sm text-[#dbe3f5] md:text-base">
+              Tu lista de precios, tu saldo, tus pedidos anteriores y repetir la compra del mes en un clic.
             </p>
           </div>
-          <a
-            href={linkWhatsApp(SITE.whatsapp, "Hola RPM, quiero pedir un presupuesto para mi empresa.")}
-            target="_blank"
-            rel="noopener"
-            className="rounded-lg bg-acento px-6 py-4 text-center font-bold hover:bg-acento-oscuro"
-          >
-            Pedir presupuesto
-          </a>
+          <div className="flex shrink-0 gap-2 md:gap-3">
+            <a
+              href={linkWhatsApp(SITE.whatsapp, "Hola RPM, quiero pedir un presupuesto para mi empresa.")}
+              target="_blank"
+              rel="noopener"
+              className="flex h-11 items-center rounded-[10px] border-[1.5px] border-white px-4 text-sm font-bold md:h-12 md:px-5 md:text-[15px]"
+            >
+              Pedir presupuesto
+            </a>
+            <Link
+              href="/empresas"
+              className="flex h-11 items-center rounded-[10px] bg-white px-4 text-sm font-bold text-marca md:h-12 md:px-5 md:text-[15px]"
+            >
+              Ingresar como empresa
+            </Link>
+          </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

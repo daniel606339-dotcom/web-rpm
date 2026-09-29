@@ -224,3 +224,70 @@ export function parsePagina(v: string | string[] | undefined): number {
   const n = Number(Array.isArray(v) ? v[0] : v);
   return Number.isInteger(n) && n > 0 && n < 1000 ? n : 1;
 }
+
+// ---------- Rubros de negocio ----------
+
+export interface Rubro {
+  slug: string;
+  nombre: string;
+  descripcion: string | null;
+  orden: number;
+  lineas: Linea[];
+}
+
+export const getRubros = cache(async (): Promise<Rubro[]> => {
+  const [rubros, rel, lineas] = await Promise.all([
+    consultar<Omit<Rubro, "lineas">>("rubros_negocio", {
+      select: "slug,nombre,descripcion,orden",
+      filtros: [{ op: "eq", col: "visible", val: true }],
+      orden: [{ col: "orden" }],
+      revalidar: 3600,
+    }).then((r) => r.filas),
+    consultar<{ rubro: string; cod_linea: string }>("rubro_negocio_linea", { revalidar: 3600 }).then((r) => r.filas),
+    getLineas(),
+  ]);
+  const porCod = new Map(lineas.map((l) => [l.cod_linea, l]));
+  return rubros.map((r) => ({
+    ...r,
+    lineas: rel
+      .filter((x) => x.rubro === r.slug)
+      .map((x) => porCod.get(x.cod_linea))
+      .filter((l): l is Linea => !!l)
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
+  }));
+});
+
+export async function getRubro(slug: string) {
+  return (await getRubros()).find((r) => r.slug === slug) ?? null;
+}
+
+// ---------- Inicio ----------
+
+/** Productos por lista de códigos, respetando el orden de la lista. */
+export async function getProductosPorCodigo(cods: string[]) {
+  if (!cods.length) return [];
+  const { filas } = await consultar<ProductoResumen>("productos", {
+    select: COLS_RESUMEN,
+    filtros: [{ op: "in", col: "cod_articulo", val: cods }],
+  });
+  const m = new Map(filas.map((p) => [p.cod_articulo, p]));
+  return cods.map((c) => m.get(c)).filter((p): p is ProductoResumen => !!p);
+}
+
+/** Línea o colección con la foto de su producto con más stock. */
+export async function getCategoriaConFoto(slug: string) {
+  const linea = await getLinea(slug);
+  const col = linea ? null : await getColeccion(slug);
+  if (!linea && !col) return null;
+  const filtro: Filtro = linea
+    ? { op: "eq", col: "cod_linea", val: linea.cod_linea }
+    : { op: "eq", col: "cod_familia", val: col!.cod_familia };
+  const { filas } = await consultar<ProductoResumen>("productos", {
+    select: "foto_url",
+    filtros: [filtro, { op: "notnull", col: "foto_url" }, { op: "gt", col: "cant_dispon", val: 0 }],
+    orden: [{ col: "cant_dispon", desc: true }],
+    limite: 1,
+    revalidar: 3600,
+  });
+  return { slug, nombre: (linea ?? col)!.nombre, foto: filas[0]?.foto_url ?? null };
+}

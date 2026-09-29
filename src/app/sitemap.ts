@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/config";
 import { consultar, type Filtro } from "@/lib/db";
-import { getColecciones, getMenu } from "@/lib/data";
+import { getColecciones, getMenu, getRubros } from "@/lib/data";
 import { urlProducto } from "@/lib/format";
 
 export const revalidate = 3600;
@@ -18,7 +18,7 @@ async function todos<T>(tabla: string, select: string, filtros: Filtro[] = []) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [menu, colecciones, productos, marcas] = await Promise.all([
+  const [menu, colecciones, productos, marcas, rubros] = await Promise.all([
     getMenu(),
     getColecciones(),
     todos<{ cod_articulo: string; nombre: string; slug: string | null; cant_dispon: number | null }>(
@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       "cod_articulo,nombre,slug,cant_dispon",
     ),
     todos<{ slug: string }>("marcas", "slug", [{ op: "eq", col: "publicar", val: true }]),
+    getRubros(),
   ]);
 
   const u = (p: string) => `${SITE.url}${p}`;
@@ -33,6 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { url: u("/"), changeFrequency: "daily", priority: 1 },
+    { url: u("/categorias"), changeFrequency: "weekly", priority: 0.6 },
+    { url: u("/rubro"), changeFrequency: "weekly", priority: 0.6 },
+    ...rubros.map((r) => ({ url: u(`/rubro/${r.slug}`), changeFrequency: "daily" as const, priority: 0.7 })),
     ...menu.map((d) => ({ url: u(`/d/${d.slug}`), changeFrequency: "daily" as const, priority: 0.8 })),
     ...[...lineas].map((s) => ({ url: u(`/c/${s}`), changeFrequency: "daily" as const, priority: 0.8 })),
     ...colecciones.map((c) => ({ url: u(`/c/${c.slug}`), changeFrequency: "weekly" as const, priority: 0.6 })),

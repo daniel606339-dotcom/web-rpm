@@ -1,21 +1,24 @@
 import Link from "next/link";
 
 /**
- * Lugar del logo. Para usar el logo real: subir el archivo a /public/logo.svg
- * (o .png) y cambiar LOGO_ARCHIVO. Mientras tanto se muestra el nombre en texto.
+ * Logo de RPM. Pendiente: cuando tengan el archivo, subirlo a /public/logo.svg
+ * (o .png) y poner la ruta en LOGO_ARCHIVO. Mientras tanto se ve el espacio reservado.
  */
 const LOGO_ARCHIVO: string | null = null; // p. ej. "/logo.svg"
 
-export default function Logo({ claro = true }: { claro?: boolean }) {
+export default function Logo({ sobreOscuro = false, className = "" }: { sobreOscuro?: boolean; className?: string }) {
   return (
-    <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Distribuidora RPM, inicio">
+    <Link href="/" aria-label="Distribuidora RPM, inicio" className={`flex shrink-0 items-center ${className}`}>
       {LOGO_ARCHIVO ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={LOGO_ARCHIVO} alt="Distribuidora RPM" className="h-9 w-auto" />
+        <img src={LOGO_ARCHIVO} alt="Distribuidora RPM" className="h-10 w-auto" />
       ) : (
-        <span className={`flex items-baseline gap-1 leading-none ${claro ? "text-white" : "text-marca"}`}>
-          <span className="text-2xl font-black tracking-tight">RPM</span>
-          <span className="text-xs font-semibold uppercase tracking-wider opacity-80">Distribuidora</span>
+        <span
+          className={`flex h-10 w-[132px] items-center justify-center rounded-lg border-[1.5px] border-dashed text-xs font-semibold tracking-wide md:h-11 md:w-[150px] ${
+            sobreOscuro ? "border-[#9fb2dc] text-[#dbe3f5]" : "border-[#b8c2d8] text-suave"
+          }`}
+        >
+          [LOGO RPM]
         </span>
       )}
     </Link>

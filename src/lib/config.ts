@@ -7,6 +7,10 @@ export const SITE = {
     "Distribuidora de artículos de librería, papelería, limpieza, higiene y empaque para empresas en Paraguay.",
   // Número de WhatsApp de ventas, formato internacional sin "+".
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP ?? "595976634184",
+  whatsappVisible: "+595 976 634 184",
+  direccion: "12 de Octubre N° 521, Barrio Pinozá, Asunción",
+  email: "ventas@distribuidorarpm.com.py",
+  anios: 19,
   ciudad: "Asunción",
   pais: "PY",
   moneda: "PYG",

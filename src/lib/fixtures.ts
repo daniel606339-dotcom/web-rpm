@@ -34,6 +34,10 @@ const lineas: Fila[] = [
   ["21", "Pilas", "pilas", "informatica"],
   ["41", "Basureros", "basureros", "mantenimiento-integral"],
   ["30", "Paños", "panos", "limpieza"],
+  ["2", "Biblioratos", "biblioratos", "libreria"],
+  ["27", "Cintas", "cintas", "libreria"],
+  ["17", "Dispensadores", "dispensadores", "higiene"],
+  ["54", "Pizarras", "pizarras", "libreria"],
 ].map(([cod_linea, nombre, slug, departamento]) => ({ cod_linea, nombre, slug, departamento, publicar: true }));
 
 const linea_menu: Fila[] = [
@@ -41,7 +45,25 @@ const linea_menu: Fila[] = [
   { cod_linea: "41", departamento: "limpieza" },
 ];
 
+const rubros_negocio: Fila[] = [
+  ["oficinas", "Oficinas", "Resmas, biblioratos, escritura, cafetería, papel higiénico"],
+  ["colegios-y-universidades", "Colegios y universidades", "Útiles escolares, pizarras, resmas, higiene institucional"],
+  ["restaurantes-y-cafeterias", "Restaurantes y cafeterías", "Descartables, film, bolsas, limpieza, servilletas"],
+  ["clinicas-y-consultorios", "Clínicas y consultorios", "Cofias, guantes, dispensadores, químicos de limpieza"],
+  ["industrias-y-depositos", "Industrias y depósitos", "Film stretch, cintas, embalaje, seguridad, contenedores"],
+  ["hoteles", "Hoteles", "Papel higiénico, amenities, bolsas de residuo, limpieza"],
+].map(([slug, nombre, descripcion], i) => ({ slug, nombre, descripcion, orden: i + 1, visible: true }));
+
+const rubro_negocio_linea: Fila[] = [
+  { rubro: "oficinas", cod_linea: "11" },
+  { rubro: "oficinas", cod_linea: "62" },
+  { rubro: "industrias-y-depositos", cod_linea: "32" },
+];
+
 const colecciones: Fila[] = [
+  { slug: "bolsas-plasticas", nombre: "Bolsas plásticas", cod_familia: "34", departamento: "hogar", publicar: true },
+  { slug: "embalajes", nombre: "Embalajes", cod_familia: "4", departamento: "libreria", publicar: true },
+  { slug: "rollos-de-papel", nombre: "Rollos de papel", cod_familia: "16", departamento: "papeleria", publicar: true },
   { slug: "cafeteria", nombre: "Cafetería", cod_familia: "15", departamento: "alimentos-y-bebidas", publicar: true },
 ];
 
@@ -96,10 +118,12 @@ const productos: Fila[] = [
   prod("Z0064", "Boligrafo de mesa azul Basy tinta azul", 5100, 539, "11", "basy"),
   prod("RH3009", "Boligel Borrable Foska Blister de 3 Colores", 9000, 260, "11", "foska"),
   prod("4974052808517", "Marcador Artline Ek100 Azul", 15500, 0, "11", "artline"),
-  prod("R11725", "Film stretch 50 cm x 2,5 kg", 64600, 85, "32", "", ""),
+  prod("R11725", "Film Stretch Rollo X 2,5 Kg. pre estirado", 64600, 85, "32", "", ""),
+  prod("7792540231091", "Resma Executive A4", 24800, 660, "62", "", ""),
+  prod("FILMSTRECH2K", "Film Strech pre estirado 45 cm x 380 metros 2 kg", 50700, 67, "32", "", ""),
 ];
 
-const tablas: Record<string, Fila[]> = { departamentos, lineas, linea_menu, colecciones, marcas, productos };
+const tablas: Record<string, Fila[]> = { departamentos, lineas, linea_menu, colecciones, marcas, productos, rubros_negocio, rubro_negocio_linea };
 
 function sinTildes(s: string) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
