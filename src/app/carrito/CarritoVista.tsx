@@ -4,23 +4,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { cambiarCantidad, quitar, totalCarrito, useCarrito, vaciar } from "@/components/carrito";
 import { IconoWhatsApp } from "@/components/iconos";
+import RepetirPedido from "@/components/RepetirPedido";
 import { SITE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
 
 // Monto para envío gratis (Gs.). Vacío u 0 = no se muestra la barra.
 const MINIMO_ENVIO = Number(process.env.NEXT_PUBLIC_MINIMO_ENVIO_GRATIS ?? 0);
 
-export default function CarritoVista() {
+export default function CarritoVista({ envioDesde }: { envioDesde: number | null }) {
   const items = useCarrito();
   const total = totalCarrito(items);
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-borde bg-white p-10 text-center">
-        <p className="mb-4 text-suave">Tu carrito está vacío.</p>
-        <Link href="/" className="inline-block rounded-lg bg-acento px-5 py-3 font-semibold text-white">
-          Ver productos
-        </Link>
+      <div className="space-y-4">
+        <RepetirPedido />
+        <div className="rounded-2xl border border-borde bg-white p-10 text-center">
+          <p className="mb-4 text-suave">Tu carrito está vacío.</p>
+          <Link href="/" className="inline-block rounded-lg bg-acento px-5 py-3 font-semibold text-white">
+            Ver productos
+          </Link>
+        </div>
       </div>
     );
   }
@@ -93,7 +97,10 @@ export default function CarritoVista() {
           <span className="text-suave">Subtotal</span>
           <span className="text-2xl font-extrabold text-marca">{gs(total)}</span>
         </div>
-        <p className="-mt-2 text-xs text-suave">El envío se calcula según tu ciudad en el siguiente paso.</p>
+        <p className="-mt-2 text-xs text-suave">
+          {envioDesde ? `Envío desde ${gs(envioDesde)} según tu ciudad, o ` : "El envío se calcula según tu ciudad, o "}
+          retiro sin costo en 2 horas.
+        </p>
         <Link
           href="/checkout"
           className="flex h-12 items-center justify-center rounded-lg bg-acento font-bold text-white hover:bg-acento-oscuro"

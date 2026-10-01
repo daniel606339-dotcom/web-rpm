@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { getMenu } from "@/lib/data";
+import { getMenu, getRubros } from "@/lib/data";
 import { SITE } from "@/lib/config";
 import { BUSQUEDAS_RAPIDAS } from "@/lib/inicio";
 import { linkWhatsApp } from "@/lib/format";
 import Logo from "./Logo";
 import CarritoBoton from "./CarritoBoton";
-import { IconoBuscar, IconoUsuario, IconoWhatsApp } from "./iconos";
+import { IconoBuscar, IconoCategorias, IconoRubro, IconoUsuario, IconoWhatsApp } from "./iconos";
 
 export default async function Header() {
-  const menu = await getMenu();
+  const [menu, rubros] = await Promise.all([getMenu(), getRubros()]);
   const wa = linkWhatsApp(SITE.whatsapp, "Hola RPM, quiero hacer una consulta.");
   return (
     <header className="md:sticky md:top-0 md:z-40 md:shadow-sm">
@@ -88,6 +88,28 @@ export default async function Header() {
               )}
             </li>
           ))}
+          {rubros.length > 0 && (
+            <li className="group relative ml-auto">
+              <Link href="/rubro" className="flex items-center gap-1.5 bg-white/15 px-3 py-3 text-sm font-bold text-white hover:bg-white/25">
+                <IconoCategorias className="size-4" /> Por tipo de negocio
+              </Link>
+              <div className="invisible absolute right-0 top-full z-50 w-[340px] rounded-b-xl border border-borde bg-white p-3 opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                <p className="px-2 pb-2 text-xs text-suave">Lo que usa tu negocio todos los meses</p>
+                <ul>
+                  {rubros.map((r) => (
+                    <li key={r.slug}>
+                      <Link href={`/rubro/${r.slug}`} className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-texto hover:bg-fondo hover:text-marca">
+                        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-marca-suave text-marca">
+                          <IconoRubro slug={r.slug} className="size-[18px]" />
+                        </span>
+                        {r.nombre}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          )}
         </ul>
       </nav>
 
@@ -107,6 +129,9 @@ export default async function Header() {
           <input id="q-celular" name="q" type="search" placeholder="Buscá un producto o código" className="h-full flex-1 bg-transparent text-base outline-none" />
         </form>
         <div className="scroll-x -mx-4 flex gap-2 px-4">
+          <Link href="/rubro" className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[13px] font-bold text-marca">
+            Por tipo de negocio
+          </Link>
           {BUSQUEDAS_RAPIDAS.map((b) => (
             <Link key={b} href={`/buscar?q=${encodeURIComponent(b)}`} className="shrink-0 rounded-full bg-white/15 px-3 py-1.5 text-[13px] text-white">
               {b}

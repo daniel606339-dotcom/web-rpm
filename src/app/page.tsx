@@ -6,7 +6,9 @@ import { BANNERS, CATEGORIAS_BUSCADAS, LO_MAS_PEDIDO } from "@/lib/inicio";
 import { linkWhatsApp } from "@/lib/format";
 import Carrusel from "@/components/Carrusel";
 import ProductoTarjeta from "@/components/ProductoTarjeta";
-import { IconoCamion, IconoChat, IconoDepartamento, IconoEscudo, IconoFactura, IconoRubro } from "@/components/iconos";
+import Beneficios from "@/components/Beneficios";
+import RepetirPedido from "@/components/RepetirPedido";
+import { IconoDepartamento, IconoRubro } from "@/components/iconos";
 
 export const revalidate = 900;
 
@@ -31,12 +33,6 @@ export default async function Inicio() {
     getProductosPorCodigo(LO_MAS_PEDIDO),
   ]);
 
-  const confianza = [
-    { Icono: IconoEscudo, titulo: `${SITE.anios} años en el mercado`, texto: "Proveedor de empresas en todo Paraguay" },
-    { Icono: IconoCamion, titulo: "Entrega a domicilio", texto: "Asunción y Gran Asunción en 48 hs · interior 72 hs" },
-    { Icono: IconoFactura, titulo: "Factura legal", texto: "A nombre de tu empresa, con tu RUC" },
-    { Icono: IconoChat, titulo: "Pedidos por WhatsApp", texto: "Armá tu pedido y te lo confirmamos" },
-  ];
 
   return (
     <div className="pb-4">
@@ -44,18 +40,15 @@ export default async function Inicio() {
         <Carrusel banners={BANNERS} />
       </div>
 
-      {/* Confianza (escritorio) */}
-      <ul className="contenedor mt-6 hidden grid-cols-4 gap-4 md:grid">
-        {confianza.map(({ Icono, titulo, texto }) => (
-          <li key={titulo} className="flex items-start gap-3 rounded-xl border border-borde bg-white px-4 py-3.5">
-            <Icono className="mt-0.5 size-5 shrink-0 text-marca" />
-            <div>
-              <p className="text-[15px] font-bold leading-tight text-titulo">{titulo}</p>
-              <p className="text-[13px] text-suave">{texto}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {/* Beneficios */}
+      <div className="contenedor mt-4 md:mt-6">
+        <Beneficios />
+      </div>
+
+      {/* Último pedido hecho en este dispositivo */}
+      <div className="contenedor">
+        <RepetirPedido className="mt-5 md:mt-6" />
+      </div>
 
       {/* Departamentos (celular) */}
       <nav aria-label="Departamentos" className="contenedor mt-5 md:hidden">

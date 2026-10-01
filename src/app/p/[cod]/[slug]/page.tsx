@@ -9,7 +9,7 @@ import Migas, { type Miga } from "@/components/Migas";
 import JsonLd from "@/components/JsonLd";
 import AgregarCarrito from "@/components/AgregarCarrito";
 import ProductoTarjeta from "@/components/ProductoTarjeta";
-import { IconoCamion, IconoEscudo, IconoFactura } from "@/components/iconos";
+import { listaBeneficios } from "@/components/Beneficios";
 
 export const revalidate = 900;
 export async function generateStaticParams() {
@@ -49,13 +49,47 @@ export default async function PaginaProducto({ params }: Props) {
   const url = urlProducto(p);
   if (`/p/${encodeURIComponent(cod)}/${slug}` !== url) permanentRedirect(url);
 
-  const [dep, relacionados] = await Promise.all([p.departamento ? getDepartamento(p.departamento) : null, getRelacionados(p)]);
+  const [dep, relacionados, beneficios] = await Promise.all([
+    p.departamento ? getDepartamento(p.departamento) : null,
+    getRelacionados(p),
+    listaBeneficios(),
+  ]);
   const hayStock = (p.cant_dispon ?? 0) > 0;
 
   const migas: Miga[] = [];
   if (dep) migas.push({ nombre: dep.nombre, href: `/d/${dep.slug}` });
   if (p.linea_slug && p.linea_nombre) migas.push({ nombre: p.linea_nombre, href: `/c/${p.linea_slug}` });
   migas.push({ nombre: p.nombre });
+
+  const enlace = "text-marca hover:underline";
+  const ficha: [string, React.ReactNode][] = [["Código", p.cod_articulo]];
+  if (p.cod_barra_art && p.cod_barra_art !== p.cod_articulo) ficha.push(["Código de barras", p.cod_barra_art]);
+  if (p.marca_nombre)
+    ficha.push([
+      "Marca",
+      p.marca_slug ? (
+        <Link href={`/m/${p.marca_slug}`} className={enlace}>
+          {p.marca_nombre}
+        </Link>
+      ) : (
+        p.marca_nombre
+      ),
+    ]);
+  if (dep)
+    ficha.push([
+      "Departamento",
+      <Link key="d" href={`/d/${dep.slug}`} className={enlace}>
+        {dep.nombre}
+      </Link>,
+    ]);
+  if (p.linea_slug && p.linea_nombre)
+    ficha.push([
+      "Categoría",
+      <Link key="c" href={`/c/${p.linea_slug}`} className={enlace}>
+        {p.linea_nombre}
+      </Link>,
+    ]);
+  ficha.push(["Disponibles", disponibles(p.cant_dispon)]);
 
   return (
     <div className="contenedor py-4 md:py-6">
@@ -103,21 +137,33 @@ export default async function PaginaProducto({ params }: Props) {
             </div>
           </div>
 
-          <ul className="grid gap-2 text-sm text-suave sm:grid-cols-3">
-            <li className="flex items-center gap-2 rounded-xl bg-white p-3">
-              <IconoFactura className="size-5 shrink-0 text-marca" /> Factura legal
-            </li>
-            <li className="flex items-center gap-2 rounded-xl bg-white p-3">
-              <IconoCamion className="size-5 shrink-0 text-marca" /> Entrega a empresas
-            </li>
-            <li className="flex items-center gap-2 rounded-xl bg-white p-3">
-              <IconoEscudo className="size-5 shrink-0 text-marca" /> 19 años en el mercado
-            </li>
+          <ul className="grid gap-2 text-sm sm:grid-cols-3">
+            {beneficios.slice(0, 3).map(({ Icono, titulo, texto }) => (
+              <li key={titulo} className="flex items-start gap-2 rounded-xl bg-white p-3">
+                <Icono className="mt-0.5 size-5 shrink-0 text-marca" />
+                <span>
+                  <span className="block font-semibold leading-tight text-titulo">{titulo}</span>
+                  <span className="block text-xs text-suave">{texto}</span>
+                </span>
+              </li>
+            ))}
           </ul>
 
           {p.texto && (
             <div className="prose max-w-none rounded-2xl border border-borde bg-white p-4 text-sm leading-relaxed whitespace-pre-line">{p.texto}</div>
           )}
+
+          <section>
+            <h2 className="mb-2 text-lg font-bold">Ficha técnica</h2>
+            <dl className="divide-y divide-borde overflow-hidden rounded-2xl border border-borde bg-white text-sm">
+              {ficha.map(([nombre, valor]) => (
+                <div key={nombre} className="grid grid-cols-[140px_1fr] gap-3 px-4 py-2.5 odd:bg-fondo/60">
+                  <dt className="text-suave">{nombre}</dt>
+                  <dd className="font-medium">{valor}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
         </div>
       </div>
 

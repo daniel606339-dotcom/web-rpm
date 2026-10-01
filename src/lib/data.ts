@@ -300,3 +300,20 @@ export async function getCategoriaConFoto(slug: string) {
   });
   return { slug, nombre: (linea ?? col)!.nombre, foto: filas[0]?.foto_url ?? null };
 }
+
+// ---------- Beneficios (envío) ----------
+
+/** Costo de envío más bajo de las zonas con delivery (para "Envío desde Gs. …"). */
+export const getEnvioDesde = cache(async (): Promise<number | null> => {
+  const { filas } = await consultar<{ costo_envio: number }>("localidades", {
+    select: "costo_envio",
+    filtros: [
+      { op: "eq", col: "tipo", val: "envio" },
+      { op: "gt", col: "costo_envio", val: 0 },
+    ],
+    orden: [{ col: "costo_envio" }],
+    limite: 1,
+    revalidar: 3600,
+  });
+  return filas[0]?.costo_envio ?? null;
+});

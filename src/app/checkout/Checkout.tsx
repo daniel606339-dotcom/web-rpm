@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { totalCarrito, useCarrito, vaciar, cambiarCantidad } from "@/components/carrito";
+import { totalCarrito, useCarrito, vaciar, cambiarCantidad, guardarUltimoPedido } from "@/components/carrito";
 import { BANCO, HORARIO_ENTREGA, SITE, SUPABASE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
 import { IconoWhatsApp } from "@/components/iconos";
@@ -141,6 +141,7 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
         },
       });
       setHecho(r);
+      if (r.numero) guardarUltimoPedido(r.numero, items);
       vaciar();
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {

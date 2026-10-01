@@ -96,3 +96,51 @@ export function vaciar() {
 export function totalCarrito(items: ItemCarrito[]) {
   return items.reduce((s, x) => s + (x.precio ?? 0) * x.cantidad, 0);
 }
+
+// ---------- Último pedido (en este dispositivo, sin cuenta) ----------
+
+export interface UltimoPedido {
+  numero: string;
+  fecha: string;
+  items: ItemCarrito[];
+}
+
+const CLAVE_ULTIMO = "rpm-ultimo-pedido-v1";
+let ultimoRaw: string | null | undefined;
+let ultimo: UltimoPedido | null = null;
+
+function leerUltimo(): UltimoPedido | null {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(CLAVE_ULTIMO);
+  } catch {
+    /* sin almacenamiento */
+  }
+  if (raw !== ultimoRaw) {
+    ultimoRaw = raw;
+    try {
+      ultimo = raw ? (JSON.parse(raw) as UltimoPedido) : null;
+    } catch {
+      ultimo = null;
+    }
+  }
+  return ultimo;
+}
+
+export function useUltimoPedido() {
+  return useSyncExternalStore(suscribir, leerUltimo, () => null);
+}
+
+export function guardarUltimoPedido(numero: string, items: ItemCarrito[]) {
+  try {
+    localStorage.setItem(CLAVE_ULTIMO, JSON.stringify({ numero, fecha: new Date().toISOString(), items }));
+  } catch {
+    /* sin almacenamiento */
+  }
+  oyentes.forEach((f) => f());
+}
+
+/** Vuelve a cargar el último pedido en el carrito (respetando el tope de stock guardado). */
+export function repetirPedido(p: UltimoPedido) {
+  for (const { cantidad, ...item } of p.items) agregar(item, cantidad);
+}
