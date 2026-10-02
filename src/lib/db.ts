@@ -31,6 +31,9 @@ export interface Resultado<T> {
 
 const usarFixtures = process.env.RPM_FIXTURES === "1";
 
+/** Etiqueta de todas las consultas a Supabase: /api/revalidar la usa para refrescar la web al instante. */
+export const ETIQUETA = "supabase";
+
 export async function consultar<T>(tabla: string, q: Consulta = {}): Promise<Resultado<T>> {
   if (usarFixtures) {
     const { consultarFixture } = await import("./fixtures");
@@ -82,7 +85,7 @@ export async function consultar<T>(tabla: string, q: Consulta = {}): Promise<Res
 
   const res = await fetch(`${SUPABASE.url}/rest/v1/${tabla}?${p}`, {
     headers,
-    next: q.revalidar === false ? undefined : { revalidate: q.revalidar ?? REVALIDAR },
+    next: q.revalidar === false ? undefined : { revalidate: q.revalidar ?? REVALIDAR, tags: [ETIQUETA] },
     cache: q.revalidar === false ? "no-store" : undefined,
   });
   if (!res.ok) {
@@ -112,7 +115,7 @@ export async function rpc<T>(funcion: string, args: Record<string, unknown>, rev
       "Content-Type": "application/json",
     },
     body: JSON.stringify(args),
-    next: { revalidate: revalidar },
+    next: { revalidate: revalidar, tags: [ETIQUETA] },
   });
   if (!res.ok) throw new Error(`Supabase rpc ${funcion}: ${res.status}`);
   return (await res.json()) as T;

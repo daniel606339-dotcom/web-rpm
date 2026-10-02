@@ -5,6 +5,7 @@ import { BUSQUEDAS_RAPIDAS } from "@/lib/inicio";
 import { linkWhatsApp } from "@/lib/format";
 import Logo from "./Logo";
 import CarritoBoton from "./CarritoBoton";
+import MenuDesplegable from "./MenuDesplegable";
 import { IconoBuscar, IconoCategorias, IconoRubro, IconoUsuario, IconoWhatsApp } from "./iconos";
 
 export default async function Header() {
@@ -66,7 +67,7 @@ export default async function Header() {
       <nav aria-label="Departamentos" className="hidden bg-marca md:block">
         <ul className="contenedor flex">
           {menu.map((d) => (
-            <li key={d.slug} className="group relative">
+            <MenuDesplegable key={d.slug}>
               <Link href={`/d/${d.slug}`} className="block px-3 py-3 text-sm font-bold text-white first:pl-0 hover:bg-white/10">
                 {d.nombre}
               </Link>
@@ -86,10 +87,10 @@ export default async function Header() {
                   </Link>
                 </div>
               )}
-            </li>
+            </MenuDesplegable>
           ))}
           {rubros.length > 0 && (
-            <li className="group relative ml-auto">
+            <MenuDesplegable className="ml-auto">
               <Link href="/rubro" className="flex items-center gap-1.5 bg-white/15 px-3 py-3 text-sm font-bold text-white hover:bg-white/25">
                 <IconoCategorias className="size-4" /> Por tipo de negocio
               </Link>
@@ -108,7 +109,7 @@ export default async function Header() {
                   ))}
                 </ul>
               </div>
-            </li>
+            </MenuDesplegable>
           )}
         </ul>
       </nav>

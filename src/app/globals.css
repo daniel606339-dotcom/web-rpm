@@ -53,3 +53,9 @@ h3 {
 .scroll-x::-webkit-scrollbar {
   display: none;
 }
+
+/* Menú de departamentos: se cierra al elegir una opción (ver MenuDesplegable.tsx) */
+.menu-cerrado > div {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}

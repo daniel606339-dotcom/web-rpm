@@ -119,6 +119,7 @@ function Lista({ email }: { email: string }) {
   const [abierto, setAbierto] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
+  const [refrescando, setRefrescando] = useState(false);
 
   const cargar = useCallback(async () => {
     const { data, error } = await sb
@@ -161,6 +162,18 @@ function Lista({ email }: { email: string }) {
     else setPedidos((xs) => xs.map((x) => (x.id === p.id ? { ...x, ...cambios, actualizado_por: email } : x)));
   }
 
+  async function refrescarWeb() {
+    const token = (await sb.auth.getSession()).data.session?.access_token;
+    if (!token) return;
+    setRefrescando(true);
+    try {
+      const r = await fetch("/api/revalidar", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      alert(r.ok ? "Listo: la web ya muestra los datos actuales de Supabase." : "No se pudo refrescar la web.");
+    } finally {
+      setRefrescando(false);
+    }
+  }
+
   return (
     <div className="contenedor py-4 md:py-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -179,6 +192,13 @@ function Lista({ email }: { email: string }) {
           </select>
           <button onClick={cargar} className="h-10 rounded-lg border border-borde bg-white px-3">
             Actualizar
+          </button>
+          <button
+            onClick={refrescarWeb}
+            title="Vuelve a leer menú, categorías, precios y stock en toda la web"
+            className="h-10 rounded-lg border border-borde bg-white px-3"
+          >
+            {refrescando ? "Refrescando…" : "Refrescar la web"}
           </button>
           <button onClick={() => sb.auth.signOut()} className="h-10 px-2 text-suave underline">
             Salir
