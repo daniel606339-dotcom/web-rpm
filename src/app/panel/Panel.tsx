@@ -1,12 +1,12 @@
 "use client";
 
-import { createClient, type Session } from "@supabase/supabase-js";
+import type { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { SUPABASE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
 import { excelPedido } from "@/lib/excelPedido";
 
-const sb = createClient(SUPABASE.url, SUPABASE.key, { db: { schema: "web" } });
+import { refrescarWeb as refrescar, sb } from "./cliente";
+import Banners from "./Banners";
 
 interface Item {
   linea: number;
@@ -74,7 +74,28 @@ export default function Panel() {
 
   if (cargandoSesion) return <div className="contenedor py-10 text-suave">Cargando…</div>;
   if (!sesion) return <Login />;
-  return <Lista email={sesion.user.email ?? ""} />;
+  return <Secciones email={sesion.user.email ?? ""} />;
+}
+
+function Secciones({ email }: { email: string }) {
+  const [seccion, setSeccion] = useState<"pedidos" | "banners">("pedidos");
+  const tab = (s: typeof seccion, texto: string) => (
+    <button
+      onClick={() => setSeccion(s)}
+      className={`h-10 border-b-2 px-4 text-sm font-bold ${seccion === s ? "border-marca text-marca" : "border-transparent text-suave hover:text-texto"}`}
+    >
+      {texto}
+    </button>
+  );
+  return (
+    <>
+      <div className="contenedor flex gap-1 border-b border-borde pt-3">
+        {tab("pedidos", "Pedidos")}
+        {tab("banners", "Banners")}
+      </div>
+      {seccion === "pedidos" ? <Lista email={email} /> : <Banners email={email} />}
+    </>
+  );
 }
 
 function Login() {
@@ -163,12 +184,9 @@ function Lista({ email }: { email: string }) {
   }
 
   async function refrescarWeb() {
-    const token = (await sb.auth.getSession()).data.session?.access_token;
-    if (!token) return;
     setRefrescando(true);
     try {
-      const r = await fetch("/api/revalidar", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
-      alert(r.ok ? "Listo: la web ya muestra los datos actuales de Supabase." : "No se pudo refrescar la web.");
+      alert((await refrescar()) ? "Listo: la web ya muestra los datos actuales de Supabase." : "No se pudo refrescar la web.");
     } finally {
       setRefrescando(false);
     }

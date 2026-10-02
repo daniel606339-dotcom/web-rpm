@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getCategoriaConFoto, getMenu, getProductosPorCodigo, getRubros } from "@/lib/data";
+import { getBanners, getCategoriaConFoto, getMenu, getProductosPorCodigo, getRubros } from "@/lib/data";
 import { SITE } from "@/lib/config";
-import { BANNERS, CATEGORIAS_BUSCADAS, LO_MAS_PEDIDO } from "@/lib/inicio";
+import { CATEGORIAS_BUSCADAS, LO_MAS_PEDIDO } from "@/lib/inicio";
 import { linkWhatsApp } from "@/lib/format";
 import Carrusel from "@/components/Carrusel";
 import ProductoTarjeta from "@/components/ProductoTarjeta";
@@ -26,7 +26,8 @@ function Titulo({ children, href, texto }: { children: React.ReactNode; href?: s
 }
 
 export default async function Inicio() {
-  const [menu, rubros, categorias, masPedido] = await Promise.all([
+  const [banners, menu, rubros, categorias, masPedido] = await Promise.all([
+    getBanners(),
     getMenu(),
     getRubros(),
     Promise.all(CATEGORIAS_BUSCADAS.map(getCategoriaConFoto)),
@@ -37,7 +38,7 @@ export default async function Inicio() {
   return (
     <div className="pb-4">
       <div className="contenedor mt-3 md:mt-5">
-        <Carrusel banners={BANNERS} />
+        <Carrusel banners={banners} />
       </div>
 
       {/* Beneficios */}

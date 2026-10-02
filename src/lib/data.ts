@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { POR_PAGINA } from "./config";
 import { consultar, type Filtro } from "./db";
+import { BANNERS, type Banner } from "./inicio";
 
 export interface Departamento {
   slug: string;
@@ -316,4 +317,17 @@ export const getEnvioDesde = cache(async (): Promise<number | null> => {
     revalidar: 3600,
   });
   return filas[0]?.costo_envio ?? null;
+});
+
+// ---------- Banners (se cargan desde el panel) ----------
+
+/** Banners vigentes del carrusel. Si no hay ninguno cargado, se muestran los espacios reservados. */
+export const getBanners = cache(async (): Promise<Banner[]> => {
+  const { filas } = await consultar<{ titulo: string; enlace: string; imagen_escritorio: string; imagen_celular: string | null }>("banners", {
+    select: "titulo,enlace,imagen_escritorio,imagen_celular",
+    orden: [{ col: "orden" }, { col: "id" }],
+    revalidar: 300,
+  }).catch(() => ({ filas: [] as { titulo: string; enlace: string; imagen_escritorio: string; imagen_celular: string | null }[] }));
+  if (!filas.length) return BANNERS;
+  return filas.map((b) => ({ titulo: b.titulo, href: b.enlace, imagen: b.imagen_escritorio, imagenCelular: b.imagen_celular ?? undefined }));
 });
