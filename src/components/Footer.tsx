@@ -45,7 +45,21 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">© {new Date().getFullYear()} Distribuidora RPM S.A.</div>
+      <div className="border-t border-white/10 py-4 text-center text-xs leading-relaxed text-white/60">
+        <p>
+          © {new Date().getFullYear()} DISTRIBUIDORA RPM S.A. · RUC 80122009-2 · {SITE.direccion}
+        </p>
+        <p className="mt-1">
+          Precios en guaraníes, IVA incluido ·{" "}
+          <Link href="/info/terminos-y-condiciones" className="underline hover:text-white">
+            Términos y condiciones
+          </Link>{" "}
+          ·{" "}
+          <Link href="/info/politica-de-privacidad" className="underline hover:text-white">
+            Política de privacidad
+          </Link>
+        </p>
+      </div>
     </footer>
   );
 }

@@ -419,6 +419,7 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
             <span className="font-semibold">Total</span>
             <span className="text-2xl font-extrabold text-marca">{gs(subtotal + envio)}</span>
           </div>
+          <p className="text-right text-xs text-suave">Precios en guaraníes, IVA incluido</p>
         </div>
 
         {error && (
@@ -441,6 +442,21 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
           </div>
         )}
 
+        <label className="flex items-start gap-2.5 text-sm">
+          <input type="checkbox" required className="mt-0.5 size-5 shrink-0 accent-[var(--color-marca)]" />
+          <span>
+            Leí y acepto los{" "}
+            <Link href="/info/terminos-y-condiciones" target="_blank" className="font-semibold text-marca underline">
+              Términos y condiciones
+            </Link>{" "}
+            y la{" "}
+            <Link href="/info/politica-de-privacidad" target="_blank" className="font-semibold text-marca underline">
+              Política de privacidad
+            </Link>
+            .
+          </span>
+        </label>
+
         <button
           type="submit"
           disabled={enviando}
@@ -449,15 +465,11 @@ export default function Checkout({ localidades }: { localidades: Localidad[] }) 
           {enviando ? "Enviando…" : "Confirmar pedido"}
         </button>
         <p className="text-xs text-suave">
-          Al confirmar aceptás nuestras{" "}
-          <Link href="/info/formas-de-entrega" className="underline">
-            condiciones de entrega
-          </Link>{" "}
-          y{" "}
-          <Link href="/info/politicas-de-devolucion" className="underline">
-            devolución
+          Tenés 5 días hábiles desde que recibís el pedido para arrepentirte de la compra (
+          <Link href="/info/politicas-de-devolucion" target="_blank" className="underline">
+            política de devolución
           </Link>
-          . Los precios se confirman al momento del pedido.
+          ).
         </p>
       </aside>
     </form>

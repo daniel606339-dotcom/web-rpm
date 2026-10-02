@@ -31,21 +31,60 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
       },
     ],
   },
-  "medios-de-pago": { titulo: "Medios de pago" },
-  "politicas-de-devolucion": {
-    titulo: "Política de devolución",
-    descripcion: "Condiciones para devolución o cambio de productos comprados en Distribuidora RPM.",
+  "medios-de-pago": {
+    titulo: "Medios de pago",
+    descripcion: "Cómo pagar tus compras en Distribuidora RPM.",
     bloques: [
       {
-        titulo: "Devolución o cambio de productos",
+        titulo: "Transferencia bancaria",
         parrafos: [
-          "Los productos adquiridos sólo podrán ser devueltos o cambiados dentro de un periodo de no más de 24 horas hábiles de haber sido recibido el pedido y con la presentación de la factura emitida por Distribuidora RPM.",
+          "Al confirmar el pedido te mostramos los datos de la cuenta y te los enviamos por email. Cuando hagas la transferencia, mandanos el comprobante con el número de pedido por WhatsApp o por email.",
+          "Banco Continental S.A.E.C.A. · Cuenta corriente en guaraníes N° 34-23106000-03 · Alias: RUC 80122009-2 · Titular: DISTRIBUIDORA RPM S.A.",
         ],
       },
       {
-        titulo: "Condiciones de devolución de productos",
+        titulo: "Tarjetas de crédito y débito",
+        parrafos: ["Próximamente vas a poder pagar con tarjeta directamente en el sitio."],
+      },
+      {
+        titulo: "Precios",
         parrafos: [
-          "Todos los productos a ser devueltos deberán entregarse junto con los embalajes originales y en perfecto estado de conservación, con los accesorios, manuales e instructivos del mismo en los casos que sean aplicables. Caso contrario no podrá hacerse efectiva la devolución.",
+          "Todos los precios están expresados en guaraníes (Gs.) e incluyen IVA. El costo de envío se muestra por separado antes de confirmar el pedido.",
+        ],
+      },
+    ],
+  },
+  "politicas-de-devolucion": {
+    titulo: "Política de devolución",
+    descripcion: "Derecho de retracto, cambios y garantía de los productos comprados en Distribuidora RPM.",
+    bloques: [
+      {
+        titulo: "Derecho de retracto (compras en este sitio)",
+        parrafos: [
+          "Si compraste a través de este sitio podés arrepentirte de la compra dentro de los 5 (cinco) días hábiles siguientes a la recepción del producto, sin necesidad de explicar el motivo, conforme al artículo 30 de la Ley N° 4868/2013 de Comercio Electrónico.",
+          "Para hacerlo, escribinos a ventas@distribuidorarpm.com.py o por WhatsApp indicando el número de pedido. El producto debe estar sin uso, en perfecto estado, con su embalaje original, accesorios y manuales, y con la factura.",
+          "Te devolvemos el importe total pagado por el producto por el mismo medio de pago que usaste: por transferencia bancaria si pagaste por transferencia, o mediante la anulación o reversión de la operación ante la procesadora si pagaste con tarjeta (el plazo de acreditación en este caso depende de tu banco). El costo de devolver el producto corre por cuenta del comprador.",
+        ],
+      },
+      {
+        titulo: "Productos sin derecho de retracto",
+        parrafos: ["Según el artículo 31 de la misma ley, el retracto no se aplica a:"],
+        lista: [
+          "Productos perecederos o de rápido vencimiento.",
+          "Productos hechos a medida o personalizados (por ejemplo, sellos o impresos con datos del cliente).",
+          "Discos, grabaciones y programas informáticos que hayan sido abiertos o desprecintados.",
+        ],
+      },
+      {
+        titulo: "Errores en el envío",
+        parrafos: [
+          "Si recibiste un producto distinto al que pediste, una cantidad incorrecta o un producto dañado en el transporte, avisanos dentro de las 24 horas hábiles de recibido el pedido para que lo cambiemos sin costo.",
+        ],
+      },
+      {
+        titulo: "Garantía",
+        parrafos: [
+          "Garantizamos los productos que vendemos contra defectos de fabricación durante 15 (quince) días desde su recepción, sin perjuicio de la garantía del fabricante y de los derechos que te otorga la Ley N° 1334/1998 de Defensa del Consumidor y del Usuario. Dentro de ese plazo reparamos, cambiamos el producto o te devolvemos el dinero. La garantía no cubre daños por mal uso, golpes, instalación incorrecta o desgaste normal.",
         ],
       },
     ],
@@ -79,6 +118,127 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
     ],
   },
   "trabaja-con-nosotros": { titulo: "Trabajá con nosotros" },
+  "terminos-y-condiciones": {
+    titulo: "Términos y condiciones",
+    descripcion: "Condiciones de compra en el sitio de Distribuidora RPM S.A.",
+    bloques: [
+      {
+        titulo: "1. Quiénes somos",
+        parrafos: [
+          "Este sitio pertenece a DISTRIBUIDORA RPM S.A., RUC 80122009-2, con domicilio en 12 de Octubre N° 521, Barrio Pinozá, Asunción, Paraguay. Email: ventas@distribuidorarpm.com.py · WhatsApp: +595 976 634 184.",
+          "Al comprar en este sitio aceptás estos términos y condiciones, que se rigen por la Ley N° 4868/2013 de Comercio Electrónico, su Decreto reglamentario N° 1165/2014 y la Ley N° 1334/1998 de Defensa del Consumidor y del Usuario.",
+        ],
+      },
+      {
+        titulo: "2. Productos, precios y stock",
+        parrafos: [
+          "Los precios están expresados en guaraníes (Gs.) e incluyen IVA. El costo de envío depende de la ciudad de entrega y se muestra antes de confirmar el pedido.",
+          "Publicamos solo productos con stock disponible y la cantidad disponible se actualiza cada hora. Si al preparar tu pedido algún producto se agotó, te avisamos para que elijas reemplazarlo, recibir el resto o cancelar esa parte, y no te cobramos lo que no podamos entregar.",
+          "Las imágenes son de los productos reales; los colores pueden variar levemente según la pantalla.",
+        ],
+      },
+      {
+        titulo: "3. Cómo se hace la compra",
+        parrafos: ["La compra no requiere crear una cuenta. Los pasos son:"],
+        lista: [
+          "Agregás los productos al carrito, donde podés cambiar cantidades o quitar productos.",
+          "En \"Finalizar compra\" elegís entrega a domicilio o retiro, y cargás tus datos y los de facturación.",
+          "Antes de confirmar ves el resumen: productos, cantidades, precios, costo de envío y total con IVA.",
+          "Al presionar \"Confirmar pedido\" aceptás la compra. Te mostramos el número de pedido en pantalla y, si nos diste tu email, te enviamos la confirmación con el detalle.",
+          "Nos comunicamos con vos para coordinar el pago y la entrega.",
+        ],
+      },
+      {
+        titulo: "4. Pago y factura",
+        parrafos: [
+          "Por ahora el pago es por transferencia bancaria (ver Medios de pago). El pedido se despacha una vez acreditado el pago, salvo que hayamos acordado otra condición.",
+          "Emitimos factura legal a nombre del RUC o la cédula que nos indiques en el pedido.",
+        ],
+      },
+      {
+        titulo: "5. Entrega",
+        parrafos: [
+          "Los plazos, zonas y costos de entrega están en la sección Formas de entrega. Si elegís retirar, el pedido queda listo en 2 horas en nuestro depósito, dentro del horario de atención.",
+        ],
+      },
+      {
+        titulo: "6. Retracto, cambios y garantía",
+        parrafos: [
+          "Tenés 5 días hábiles desde que recibís el producto para arrepentirte de la compra, y 15 días de garantía por defectos de fabricación. Las condiciones y excepciones están en la Política de devolución.",
+        ],
+      },
+      {
+        titulo: "7. Compras de empresas",
+        parrafos: [
+          "Las empresas con cuenta en nuestro portal compran con las condiciones comerciales acordadas con Distribuidora RPM (lista de precios, plazos de pago y direcciones de entrega). En lo no previsto en ese acuerdo se aplican estos términos.",
+        ],
+      },
+      {
+        titulo: "8. Registro del pedido y consultas",
+        parrafos: [
+          "Cada pedido queda registrado con su número, fecha y detalle. Podés pedirnos una copia en cualquier momento.",
+          "Para consultas o reclamos escribinos a ventas@distribuidorarpm.com.py o por WhatsApp al +595 976 634 184. Si no quedás conforme con nuestra respuesta, podés recurrir a la Secretaría de Defensa del Consumidor y el Usuario (SEDECO) o al Ministerio de Industria y Comercio, autoridad de aplicación de la Ley de Comercio Electrónico.",
+        ],
+      },
+      {
+        titulo: "9. Cambios en estos términos",
+        parrafos: [
+          "Podemos actualizar estos términos. Cada compra se rige por los términos vigentes al momento de confirmarla. Vigentes desde el 1 de octubre de 2026.",
+        ],
+      },
+    ],
+  },
+  "politica-de-privacidad": {
+    titulo: "Política de privacidad",
+    descripcion: "Cómo Distribuidora RPM S.A. trata los datos personales de sus clientes.",
+    bloques: [
+      {
+        titulo: "Responsable",
+        parrafos: [
+          "DISTRIBUIDORA RPM S.A., RUC 80122009-2, 12 de Octubre N° 521, Asunción, es responsable de los datos personales que nos das en este sitio. Contacto: ventas@distribuidorarpm.com.py.",
+        ],
+      },
+      {
+        titulo: "Qué datos pedimos",
+        lista: [
+          "Nombre o razón social, RUC o cédula, teléfono y email.",
+          "Dirección, ciudad y referencias de entrega.",
+          "Tu ubicación, solo si elegís compartirla con el botón \"Usar mi ubicación actual\".",
+          "El detalle de tus pedidos.",
+          "En el portal de empresas, el email y el nombre de cada usuario.",
+        ],
+      },
+      {
+        titulo: "Para qué los usamos",
+        parrafos: [
+          "Para procesar y entregar tu pedido, emitir la factura, comunicarnos con vos sobre la compra y atender consultas o reclamos. También usamos estadísticas de navegación sin identificarte para mejorar el sitio. Solo te enviaremos promociones si nos lo autorizás, y siempre vas a poder darte de baja de forma simple y gratuita.",
+        ],
+      },
+      {
+        titulo: "Con quién los compartimos",
+        parrafos: [
+          "No vendemos ni cedemos tus datos. Solo los compartimos con quienes necesitamos para cumplir con tu pedido o con la ley: el servicio de entrega, la procesadora de pagos, nuestros proveedores de tecnología (alojamiento del sitio, base de datos y envío de emails) y las autoridades que lo requieran, como la administración tributaria.",
+        ],
+      },
+      {
+        titulo: "Cuánto tiempo y con qué seguridad",
+        parrafos: [
+          "Guardamos los datos de las compras durante el plazo que exigen las normas tributarias y comerciales. El sitio usa conexión cifrada (HTTPS) y el acceso a los datos de pedidos está restringido al personal autorizado.",
+          "Tu carrito y tu último pedido se guardan solo en tu navegador, para que no los pierdas. Podés borrarlos limpiando los datos del sitio en tu navegador.",
+        ],
+      },
+      {
+        titulo: "Tus derechos",
+        parrafos: [
+          "Podés pedirnos en cualquier momento acceder a tus datos, corregirlos, eliminarlos u oponerte a su uso, escribiendo a ventas@distribuidorarpm.com.py, de acuerdo con la Ley N° 7593/2025 de Protección de Datos Personales y demás normas vigentes.",
+        ],
+      },
+      {
+        titulo: "Cambios",
+        parrafos: ["Podemos actualizar esta política y publicaremos aquí la versión vigente. Vigente desde el 1 de octubre de 2026."],
+      },
+    ],
+  },
 };
 
 type Props = { params: Promise<{ slug: string }> };
@@ -118,10 +278,10 @@ export default async function Info({ params }: Props) {
                   </p>
                 ))}
                 {b.lista && (
-                  <ul className="grid gap-2 sm:grid-cols-2">
+                  <ul className={`grid gap-2 ${b.lista.some((t) => t.length > 40) ? "" : "sm:grid-cols-2"}`}>
                     {b.lista.map((t) => (
-                      <li key={t} className="flex items-center gap-2">
-                        <span className="size-2 rounded-full bg-acento" aria-hidden />
+                      <li key={t} className="flex items-start gap-2">
+                        <span className="mt-[0.6em] size-2 shrink-0 rounded-full bg-acento" aria-hidden />
                         {t}
                       </li>
                     ))}
