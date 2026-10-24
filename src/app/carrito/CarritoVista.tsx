@@ -5,6 +5,8 @@ import Link from "next/link";
 import { cambiarCantidad, quitar, totalCarrito, useCarrito, vaciar } from "@/components/carrito";
 import { IconoWhatsApp } from "@/components/iconos";
 import RepetirPedido from "@/components/RepetirPedido";
+import { usePortal } from "@/lib/portal";
+import CarritoPortal from "./CarritoPortal";
 import { SITE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
 
@@ -12,6 +14,12 @@ import { gs, linkWhatsApp } from "@/lib/format";
 const MINIMO_ENVIO = Number(process.env.NEXT_PUBLIC_MINIMO_ENVIO_GRATIS ?? 0);
 
 export default function CarritoVista({ envioDesde }: { envioDesde: number | null }) {
+  const { cuenta } = usePortal();
+  if (cuenta) return <CarritoPortal cuenta={cuenta} />;
+  return <CarritoPublico envioDesde={envioDesde} />;
+}
+
+function CarritoPublico({ envioDesde }: { envioDesde: number | null }) {
   const items = useCarrito();
   const total = totalCarrito(items);
 

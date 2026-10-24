@@ -161,7 +161,7 @@ export default async function Inicio() {
           <div>
             <h2 className="text-lg font-bold !text-white md:text-2xl">¿Comprás para tu empresa?</h2>
             <p className="mt-1 text-sm text-[#dbe3f5] md:text-base">
-              Tu lista de precios, tu saldo, tus pedidos anteriores y repetir la compra del mes en un clic.
+              Tus precios acordados, tus pedidos anteriores y repetir la compra del mes en un clic.
             </p>
           </div>
           <div className="flex shrink-0 gap-2 md:gap-3">

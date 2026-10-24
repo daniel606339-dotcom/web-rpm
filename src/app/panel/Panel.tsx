@@ -7,6 +7,7 @@ import { excelPedido } from "@/lib/excelPedido";
 
 import { refrescarWeb as refrescar, sb } from "./cliente";
 import Banners from "./Banners";
+import Empresas from "./Empresas";
 
 interface Item {
   linea: number;
@@ -31,6 +32,10 @@ interface Pedido {
   lat: number | null;
   lng: number | null;
   metodo_pago: string;
+  origen: "web" | "portal";
+  cod_cliente: string | null;
+  portal_usuario: string | null;
+  orden_compra: string | null;
   observaciones: string | null;
   subtotal: number;
   costo_envio: number;
@@ -78,7 +83,7 @@ export default function Panel() {
 }
 
 function Secciones({ email }: { email: string }) {
-  const [seccion, setSeccion] = useState<"pedidos" | "banners">("pedidos");
+  const [seccion, setSeccion] = useState<"pedidos" | "empresas" | "banners">("pedidos");
   const tab = (s: typeof seccion, texto: string) => (
     <button
       onClick={() => setSeccion(s)}
@@ -91,9 +96,10 @@ function Secciones({ email }: { email: string }) {
     <>
       <div className="contenedor flex gap-1 border-b border-borde pt-3">
         {tab("pedidos", "Pedidos")}
+        {tab("empresas", "Empresas")}
         {tab("banners", "Banners")}
       </div>
-      {seccion === "pedidos" ? <Lista email={email} /> : <Banners email={email} />}
+      {seccion === "pedidos" ? <Lista email={email} /> : seccion === "empresas" ? <Empresas /> : <Banners email={email} />}
     </>
   );
 }
@@ -246,6 +252,7 @@ function Lista({ email }: { email: string }) {
                 <span className="font-bold text-marca">{p.numero}</span>
                 <span className="hidden text-sm text-suave md:block">{fecha(p.creado_at)}</span>
                 <span className="truncate">
+                  {p.origen === "portal" && <span className="mr-1.5 rounded bg-marca px-1.5 py-0.5 text-[11px] font-bold text-white">EMPRESA</span>}
                   <b>{p.nombre}</b> <span className="text-sm text-suave">· RUC {p.ruc}</span>
                 </span>
                 <span className="hidden truncate text-sm text-suave md:block">{p.localidad}</span>
@@ -323,6 +330,13 @@ function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido
         <div className="rounded-lg bg-white p-3 leading-relaxed">
           <p className="font-bold">{p.nombre}</p>
           <p>RUC/CI: {p.ruc}</p>
+          {p.origen === "portal" && (
+            <p className="text-marca">
+              Portal de empresas · cliente {p.cod_cliente}
+              {p.portal_usuario ? ` · pidió ${p.portal_usuario}` : ""}
+              {p.orden_compra ? ` · OC ${p.orden_compra}` : ""}
+            </p>
+          )}
           <p>
             Tel.:{" "}
             <a className="text-marca underline" href={linkWhatsApp(telWa(p.telefono), `Hola ${p.nombre}, te escribimos de RPM por tu pedido ${p.numero}.`)} target="_blank" rel="noopener">
@@ -338,7 +352,7 @@ function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido
               Ver ubicación GPS
             </a>
           )}
-          <p className="mt-2 text-suave">Pago: {p.metodo_pago}</p>
+          <p className="mt-2 text-suave">Pago: {p.metodo_pago === "cuenta_cliente" ? "según condiciones del cliente" : p.metodo_pago}</p>
         </div>
         <label className="block">
           <span className="mb-1 block font-semibold">Estado</span>

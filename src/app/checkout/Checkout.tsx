@@ -6,6 +6,7 @@ import { totalCarrito, useCarrito, vaciar, cambiarCantidad, guardarUltimoPedido 
 import { BANCO, HORARIO_ENTREGA, SITE, SUPABASE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
 import { IconoWhatsApp } from "@/components/iconos";
+import { usePortal } from "@/lib/portal";
 
 export interface Localidad {
   id: number;
@@ -31,6 +32,21 @@ const campo =
 const etiqueta = "mb-1 block text-sm font-semibold text-titulo";
 
 export default function Checkout({ localidades }: { localidades: Localidad[] }) {
+  const { cuenta } = usePortal();
+  if (cuenta)
+    return (
+      <p className="rounded-2xl border border-borde bg-white p-8 text-center">
+        Estás comprando como <b>{cuenta.razon_social}</b>.{" "}
+        <Link href="/empresas/pedido" className="font-semibold text-marca underline">
+          Confirmá el pedido con tus precios y direcciones
+        </Link>
+        .
+      </p>
+    );
+  return <CheckoutPublico localidades={localidades} />;
+}
+
+function CheckoutPublico({ localidades }: { localidades: Localidad[] }) {
   const items = useCarrito();
   const subtotal = totalCarrito(items);
 

@@ -6,6 +6,7 @@ import { linkWhatsApp } from "@/lib/format";
 import Logo from "./Logo";
 import CarritoBoton from "./CarritoBoton";
 import MenuDesplegable from "./MenuDesplegable";
+import { EnlaceCuenta } from "./PrecioCliente";
 import { IconoBuscar, IconoCategorias, IconoRubro, IconoUsuario, IconoWhatsApp } from "./iconos";
 
 export default async function Header() {
@@ -58,7 +59,7 @@ export default async function Header() {
             </button>
           </form>
           <Link href="/empresas" className="flex items-center gap-2 text-sm font-semibold text-texto hover:text-marca">
-            <IconoUsuario className="size-5" /> Mi cuenta
+            <IconoUsuario className="size-5" /> <EnlaceCuenta />
           </Link>
           <CarritoBoton />
         </div>

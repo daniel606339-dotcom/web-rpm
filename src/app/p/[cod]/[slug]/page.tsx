@@ -8,6 +8,7 @@ import { disponibles, gs, urlProducto } from "@/lib/format";
 import Migas, { type Miga } from "@/components/Migas";
 import JsonLd from "@/components/JsonLd";
 import AgregarCarrito from "@/components/AgregarCarrito";
+import { PrecioProducto } from "@/components/PrecioCliente";
 import ProductoTarjeta from "@/components/ProductoTarjeta";
 import { listaBeneficios } from "@/components/Beneficios";
 
@@ -119,8 +120,7 @@ export default async function PaginaProducto({ params }: Props) {
           </div>
 
           <div className="rounded-2xl border border-borde bg-white p-4 md:p-5">
-            <div className="text-3xl font-extrabold text-marca">{gs(p.precio_venta)}</div>
-            <div className="text-xs text-suave">IVA incluido</div>
+            <PrecioProducto cod={p.cod_articulo} precio={p.precio_venta} />
             <div className={`mt-1 text-sm font-semibold ${hayStock ? "text-ok" : "text-suave"}`}>
               {hayStock ? `● En stock: ${disponibles(p.cant_dispon)}` : "Sin stock"}
             </div>

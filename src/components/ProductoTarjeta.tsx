@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ProductoResumen } from "@/lib/data";
 import { SITE } from "@/lib/config";
-import { disponibles, gs, linkWhatsApp, urlProducto } from "@/lib/format";
+import { disponibles, linkWhatsApp, urlProducto } from "@/lib/format";
+import { PrecioTarjeta } from "./PrecioCliente";
 
 export default function ProductoTarjeta({ p, prioridad = false }: { p: ProductoResumen; prioridad?: boolean }) {
   const hayStock = (p.cant_dispon ?? 0) > 0;
@@ -36,7 +37,7 @@ export default function ProductoTarjeta({ p, prioridad = false }: { p: ProductoR
         >
           {hayStock ? `● ${disponibles(p.cant_dispon)}` : "Sin stock"}
         </span>
-        <span className="font-titulo text-lg font-extrabold text-texto md:text-xl">{gs(p.precio_venta)}</span>
+        <PrecioTarjeta cod={p.cod_articulo} precio={p.precio_venta} />
         <a
           href={linkWhatsApp(SITE.whatsapp, msg)}
           target="_blank"

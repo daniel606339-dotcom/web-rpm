@@ -1,8 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE } from "@/lib/config";
+import { sb } from "@/lib/portal";
 
-/** Cliente de Supabase del panel (esquema web, sesión del usuario del staff). */
-export const sb = createClient(SUPABASE.url, SUPABASE.key, { db: { schema: "web" } });
+/** Cliente de Supabase del panel: el mismo del portal (una sola sesión por navegador). */
+export { sb };
 
 /** Hace que la web vuelva a leer los datos de Supabase al instante. Devuelve true si salió bien. */
 export async function refrescarWeb(): Promise<boolean> {
