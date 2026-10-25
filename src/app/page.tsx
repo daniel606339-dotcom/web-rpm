@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getBanners, getCategoriaConFoto, getMenu, getProductosPorCodigo, getRubros } from "@/lib/data";
@@ -11,6 +12,10 @@ import RepetirPedido from "@/components/RepetirPedido";
 import { IconoDepartamento, IconoRubro } from "@/components/iconos";
 
 export const revalidate = 900;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 function Titulo({ children, href, texto }: { children: React.ReactNode; href?: string; texto?: string }) {
   return (
@@ -37,6 +42,8 @@ export default async function Inicio() {
 
   return (
     <div className="pb-4">
+      {/* Título principal para Google y lectores de pantalla (el inicio arranca con el carrusel). */}
+      <h1 className="sr-only">Distribuidora RPM: librería, limpieza, papelería y empaque para empresas en Paraguay</h1>
       <div className="contenedor mt-3 md:mt-5">
         <Carrusel banners={banners} />
       </div>

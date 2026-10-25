@@ -17,7 +17,7 @@ export default function ProductoTarjeta({ p, prioridad = false }: { p: ProductoR
         {p.foto_url ? (
           <Image
             src={p.foto_url}
-            alt=""
+            alt={p.nombre}
             fill
             sizes="(min-width: 1280px) 240px, (min-width: 768px) 25vw, 50vw"
             className="object-contain p-4 transition group-hover:scale-[1.03]"

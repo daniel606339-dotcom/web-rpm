@@ -10,6 +10,15 @@ export default function Footer() {
         <div>
           <Logo sobreOscuro />
           <p className="mt-3">{SITE.anios} años distribuyendo en Paraguay</p>
+          <ul className="mt-4 flex gap-4" aria-label="Redes sociales">
+            {SITE.redes.map((r) => (
+              <li key={r.url}>
+                <a href={r.url} target="_blank" rel="noopener me" className="font-semibold underline underline-offset-2 hover:text-white">
+                  {r.nombre}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
         <div>
           <h2 className="mb-3 text-[15px] font-bold !text-white">Contacto</h2>

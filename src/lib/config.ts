@@ -14,6 +14,17 @@ export const SITE = {
   ciudad: "Asunción",
   pais: "PY",
   moneda: "PYG",
+  razonSocial: "DISTRIBUIDORA RPM S.A.",
+  ruc: "80122009-2",
+  fundacion: "2007-03",
+  // Ubicación del depósito (la misma que publica el sitio de Porta y el Perfil de Google).
+  geo: { lat: -25.308001, lng: -57.613601 },
+  // Perfiles oficiales. Se usan en el footer y en el "sameAs" de los datos estructurados:
+  // agregar acá cualquier red nueva (LinkedIn, TikTok, el Perfil de Google, etc.).
+  redes: [
+    { nombre: "Instagram", url: "https://www.instagram.com/distribuidorarpm/" },
+    { nombre: "Facebook", url: "https://www.facebook.com/distribuidorarpm/" },
+  ],
 };
 
 /** Datos para transferencia (los mismos que publica Porta hoy). */
