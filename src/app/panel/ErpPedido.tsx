@@ -61,12 +61,16 @@ export default function ErpPedido({ p, onCambio }: { p: PedidoErp; onCambio: () 
     const cod = manual.trim();
     if (!cod) return;
     const { data } = await sb.from("clientes").select("cod_cliente, razon_social, ruc, activo").eq("cod_cliente", cod).maybeSingle();
-    if (!data) {
-      setError(`No hay cliente ${cod} en Inventiva (o todavía no se sincronizó; la sincronización corre cada hora).`);
-      return;
-    }
+    // Un cliente recién cargado en el ERP todavía no está acá (la copia se actualiza cada hora),
+    // pero se puede usar igual: el servidor lo verifica directo en Inventiva al grabar.
+    const fila: ClienteErp = (data as ClienteErp | null) ?? {
+      cod_cliente: cod,
+      razon_social: "(recién cargado: se verifica en Inventiva al grabar)",
+      ruc: "",
+      activo: null,
+    };
     setError(null);
-    setCandidatos((xs) => [data as ClienteErp, ...(xs ?? []).filter((x) => x.cod_cliente !== cod)]);
+    setCandidatos((xs) => [fila, ...(xs ?? []).filter((x) => x.cod_cliente !== cod)]);
     setElegido(cod);
   }
 
@@ -122,8 +126,8 @@ export default function ErpPedido({ p, onCambio }: { p: PedidoErp; onCambio: () 
             <p className="text-suave">Buscando el RUC en Inventiva…</p>
           ) : candidatos.length === 0 ? (
             <p className="text-red-700">
-              El RUC {p.ruc} no está en Inventiva. Cargá el cliente en el ERP; aparece acá en la próxima sincronización (cada hora), o
-              escribí su código abajo.
+              El RUC {p.ruc} no aparece en Inventiva. Cargá el cliente en el ERP y escribí su código abajo (no hace falta esperar la
+              sincronización).
             </p>
           ) : (
             <div className="space-y-1">
