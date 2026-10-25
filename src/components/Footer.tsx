@@ -40,6 +40,11 @@ export default function Footer() {
               </a>
             </li>
             <li>
+              <a href={`tel:+${SITE.telefono}`} className="hover:text-white">
+                Teléfono {SITE.telefonoVisible}
+              </a>
+            </li>
+            <li>
               <a href={linkWhatsApp(SITE.whatsapp, "Hola RPM")} target="_blank" rel="noopener" className="hover:text-white">
                 WhatsApp {SITE.whatsappVisible}
               </a>

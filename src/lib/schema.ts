@@ -24,7 +24,7 @@ export function schemaOrganizacion() {
     logo: `${SITE.url}/logo.png`,
     image: `${SITE.url}/compartir.png`,
     email: SITE.email,
-    telephone: `+${SITE.whatsapp}`,
+    telephone: `+${SITE.telefono}`,
     taxID: SITE.ruc,
     foundingDate: SITE.fundacion,
     currenciesAccepted: SITE.moneda,

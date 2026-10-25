@@ -23,7 +23,7 @@ export async function GET() {
 - Envío ${envioDesde ? `desde ${gs(envioDesde)} ` : ""}según la ciudad (hasta 48 h en Asunción y Gran Asunción, 72 h en el interior) o retiro sin costo en el depósito, listo en 2 horas.
 - Las empresas con precios acordados compran en el portal para empresas: ${u("/empresas")}
 
-Contacto: WhatsApp ${SITE.whatsappVisible} · ${SITE.email} · ${SITE.direccion} (${SITE.entreCalles}), Paraguay.
+Contacto: teléfono ${SITE.telefonoVisible} · WhatsApp ${SITE.whatsappVisible} · ${SITE.email} · ${SITE.direccion} (${SITE.entreCalles}), Paraguay.
 Horario de atención: ${HORARIO_ATENCION.map((h) => h.texto.toLowerCase()).join(" y ")}.
 
 ## Información para clientes

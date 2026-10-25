@@ -8,6 +8,9 @@ export const SITE = {
   // Número de WhatsApp de ventas, formato internacional sin "+".
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP ?? "595976634184",
   whatsappVisible: "+595 976 634 184",
+  // Teléfono principal (llamadas): el mismo que figura en el Perfil de Empresa de Google.
+  telefono: "595971155666",
+  telefonoVisible: "0971 155 666",
   direccion: "12 de Octubre N° 521, Barrio Pinozá, Asunción",
   // Calles que cruzan (el local está a mitad de cuadra). Igual que la línea 2 del Perfil de Google.
   entreCalles: "entre 14 de Junio e Igualdad",
