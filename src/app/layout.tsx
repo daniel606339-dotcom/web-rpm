@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: SITE.nombre,
     locale: "es_PY",
     type: "website",
-    images: [{ url: "/compartir.png", width: 1200, height: 630, alt: "Distribuidora RPM: librería, limpieza y papelería para empresas" }],
+    images: [{ url: "/compartir.png", width: 1200, height: 630, alt: "Distribuidora RPM: soluciones de abastecimiento para empresas y personas" }],
   },
   twitter: { card: "summary_large_image", images: ["/compartir.png"] },
   // Solo se indexa cuando RPM_INDEXAR=1 (se activa al pasar al dominio real).
