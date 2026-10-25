@@ -9,6 +9,8 @@ export const SITE = {
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP ?? "595976634184",
   whatsappVisible: "+595 976 634 184",
   direccion: "12 de Octubre N° 521, Barrio Pinozá, Asunción",
+  // Calles que cruzan (el local está a mitad de cuadra). Igual que la línea 2 del Perfil de Google.
+  entreCalles: "entre 14 de Junio e Igualdad",
   email: "ventas@distribuidorarpm.com.py",
   anios: 19,
   ciudad: "Asunción",
@@ -37,6 +39,12 @@ export const BANCO = {
   ruc: "80122009-2",
   emailComprobante: "rcaballero@distribuidorarpm.com.py",
 };
+
+/** Horario de atención del local: el mismo que el Perfil de Empresa de Google. */
+export const HORARIO_ATENCION = [
+  { dias: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], abre: "08:00", cierra: "17:00", texto: "Lunes a viernes de 8:00 a 17:00" },
+  { dias: ["Saturday"], abre: "08:00", cierra: "12:00", texto: "Sábados de 8:00 a 12:00" },
+];
 
 export const HORARIO_ENTREGA = ["Lunes a viernes: 09:00 a 17:00", "Sábados: 09:00 a 12:00"];
 

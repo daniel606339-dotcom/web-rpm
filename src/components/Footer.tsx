@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE } from "@/lib/config";
+import { HORARIO_ATENCION, SITE } from "@/lib/config";
 import { linkWhatsApp } from "@/lib/format";
 import Logo from "./Logo";
 
@@ -23,7 +23,17 @@ export default function Footer() {
         <div>
           <h2 className="mb-3 text-[15px] font-bold !text-white">Contacto</h2>
           <ul className="space-y-2">
-            <li>{SITE.direccion}</li>
+            <li>
+              {SITE.direccion}
+              <span className="block text-white/60">({SITE.entreCalles})</span>
+            </li>
+            <li>
+              {HORARIO_ATENCION.map((h) => (
+                <span key={h.texto} className="block">
+                  {h.texto}
+                </span>
+              ))}
+            </li>
             <li>
               <a href={`mailto:${SITE.email}`} className="hover:text-white">
                 {SITE.email}
