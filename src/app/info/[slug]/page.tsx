@@ -3,18 +3,27 @@ import { notFound } from "next/navigation";
 import { SITE } from "@/lib/config";
 import { linkWhatsApp } from "@/lib/format";
 import Migas from "@/components/Migas";
+import JsonLd from "@/components/JsonLd";
+import { schemaPreguntas } from "@/lib/schema";
 
 /**
  * Páginas informativas. Para editar un texto, cambiarlo acá.
  * Una página sin "bloques" muestra "Estamos preparando esta sección" y no se indexa.
+ * "preguntas" se muestra al final como preguntas frecuentes y se marca con FAQPage
+ * (Google y las IA las leen). Si cambia un dato en los bloques, actualizar también la respuesta.
  */
+interface Pregunta {
+  pregunta: string;
+  respuesta: string;
+}
+
 interface Bloque {
   titulo?: string;
   parrafos?: string[];
   lista?: string[];
 }
 
-const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: Bloque[] }> = {
+const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: Bloque[]; preguntas?: Pregunta[] }> = {
   "formas-de-entrega": {
     titulo: "Formas de entrega",
     descripcion: "Costos, plazos y zonas de entrega de Distribuidora RPM en Asunción, Gran Asunción y el interior.",
@@ -28,6 +37,28 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
           "El servicio de entrega a domicilio tendrá un costo, que aparecerá expresado y diferenciado en la etapa del proceso de llenado del carrito previa a la emisión de su pedido. Dicho costo se añadirá al de las mercaderías detalladas en la correspondiente factura.",
           "La confirmación del pedido y la aprobación de la emisión de la factura implicarán la aceptación del usuario del costo del servicio de entrega a domicilio y, consecuentemente, también del monto total de la correspondiente factura.",
         ],
+      },
+    ],
+    preguntas: [
+      {
+        pregunta: "¿Cuánto tarda en llegar mi pedido?",
+        respuesta: "En Asunción y Gran Asunción entregamos en un plazo no mayor a 48 horas y en el interior del país dentro de las 72 horas, contadas desde el email que te avisa que tu pedido salió.",
+      },
+      {
+        pregunta: "¿Cuánto cuesta el envío?",
+        respuesta: "Depende de la ciudad de entrega. El costo se muestra por separado en el carrito, antes de confirmar el pedido.",
+      },
+      {
+        pregunta: "¿Puedo retirar el pedido yo mismo?",
+        respuesta: `Sí. El retiro no tiene costo y el pedido queda listo en 2 horas en nuestro depósito de ${SITE.direccion}.`,
+      },
+      {
+        pregunta: "¿Hacen envíos al interior del país?",
+        respuesta: "Sí, a las localidades habilitadas. Las podés ver al elegir la ciudad de entrega en el proceso de compra.",
+      },
+      {
+        pregunta: "¿Mi pedido puede llegar en más de una entrega?",
+        respuesta: "Puede pasar, para que recibas antes lo que ya está listo. Si ocurre, te avisamos por email antes del envío.",
       },
     ],
   },
@@ -51,6 +82,24 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
         parrafos: [
           "Todos los precios están expresados en guaraníes (Gs.) e incluyen IVA. El costo de envío se muestra por separado antes de confirmar el pedido.",
         ],
+      },
+    ],
+    preguntas: [
+      {
+        pregunta: "¿Tengo que crear una cuenta para comprar?",
+        respuesta: "No. Podés comprar sin registrarte: cargás tus datos y tu RUC al finalizar el pedido. Las empresas con precios acordados pueden usar el portal para empresas.",
+      },
+      {
+        pregunta: "¿Cómo pago mi pedido?",
+        respuesta: "Por transferencia bancaria. Al confirmar el pedido te mostramos los datos de la cuenta y te los enviamos por email; después nos mandás el comprobante con el número de pedido por WhatsApp o por email.",
+      },
+      {
+        pregunta: "¿Los precios incluyen IVA?",
+        respuesta: "Sí. Todos los precios están en guaraníes e incluyen IVA. El envío se muestra aparte antes de confirmar.",
+      },
+      {
+        pregunta: "¿Emiten factura a nombre de mi empresa?",
+        respuesta: "Sí, emitimos factura legal a nombre de tu empresa, con tu RUC.",
       },
     ],
   },
@@ -86,6 +135,20 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
         parrafos: [
           "Garantizamos los productos que vendemos contra defectos de fabricación durante 15 (quince) días desde su recepción, sin perjuicio de la garantía del fabricante y de los derechos que te otorga la Ley N° 1334/1998 de Defensa del Consumidor y del Usuario. Dentro de ese plazo reparamos, cambiamos el producto o te devolvemos el dinero. La garantía no cubre daños por mal uso, golpes, instalación incorrecta o desgaste normal.",
         ],
+      },
+    ],
+    preguntas: [
+      {
+        pregunta: "¿Puedo devolver un producto que compré en el sitio?",
+        respuesta: "Sí, dentro de los 5 días hábiles siguientes a recibirlo, sin explicar el motivo. El producto tiene que estar sin uso, con su embalaje original y la factura. Escribinos por WhatsApp o email con el número de pedido.",
+      },
+      {
+        pregunta: "¿Qué hago si recibí un producto equivocado o dañado?",
+        respuesta: "Avisanos dentro de las 24 horas hábiles de recibido el pedido y lo cambiamos sin costo.",
+      },
+      {
+        pregunta: "¿Qué garantía tienen los productos?",
+        respuesta: "Garantizamos los productos contra defectos de fabricación durante 15 días desde su recepción, además de la garantía del fabricante. No cubre mal uso, golpes ni desgaste normal.",
       },
     ],
   },
@@ -298,6 +361,20 @@ export default async function Info({ params }: Props) {
             </a>
             .
           </p>
+        )}
+        {p.preguntas && (
+          <section className="mt-10 border-t border-borde pt-8">
+            <h2 className="mb-4 text-xl font-bold md:text-2xl">Preguntas frecuentes</h2>
+            <dl className="space-y-5 text-[17px] leading-relaxed">
+              {p.preguntas.map((q) => (
+                <div key={q.pregunta}>
+                  <dt className="font-bold text-titulo">{q.pregunta}</dt>
+                  <dd className="mt-1">{q.respuesta}</dd>
+                </div>
+              ))}
+            </dl>
+            <JsonLd data={schemaPreguntas(p.preguntas)} />
+          </section>
         )}
       </article>
     </div>

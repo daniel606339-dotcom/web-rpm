@@ -7,6 +7,7 @@ import { SITE } from "@/lib/config";
 import { disponibles, gs, urlProducto } from "@/lib/format";
 import Migas, { type Miga } from "@/components/Migas";
 import JsonLd from "@/components/JsonLd";
+import { ID_ORGANIZACION } from "@/lib/schema";
 import AgregarCarrito from "@/components/AgregarCarrito";
 import { PrecioProducto } from "@/components/PrecioCliente";
 import ProductoTarjeta from "@/components/ProductoTarjeta";
@@ -30,7 +31,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: p.seo_title ?? p.nombre,
     description: descripcion,
     alternates: { canonical: urlProducto(p) },
-    openGraph: { title: p.nombre, description: descripcion, images: p.foto_url ? [p.foto_url] : undefined, type: "website" },
+    openGraph: {
+      title: p.nombre,
+      description: descripcion,
+      siteName: SITE.nombre,
+      locale: "es_PY",
+      type: "website",
+      images: [p.foto_url ? { url: p.foto_url, alt: p.nombre } : { url: "/compartir.png", width: 1200, height: 630 }],
+    },
+    twitter: { card: "summary_large_image", title: p.nombre, description: descripcion, images: [p.foto_url ?? "/compartir.png"] },
   };
 }
 
@@ -209,7 +218,7 @@ export default async function PaginaProducto({ params }: Props) {
                   price: p.precio_venta,
                   availability: hayStock ? "https://schema.org/InStock" : "https://schema.org/BackOrder",
                   itemCondition: "https://schema.org/NewCondition",
-                  seller: { "@type": "Organization", name: "Distribuidora RPM S.A." },
+                  seller: { "@type": "Organization", "@id": ID_ORGANIZACION, name: SITE.nombre },
                 },
               }
             : {}),

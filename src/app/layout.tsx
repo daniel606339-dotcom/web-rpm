@@ -7,6 +7,7 @@ import WhatsAppFlotante from "@/components/WhatsAppFlotante";
 import NavInferior from "@/components/NavInferior";
 import JsonLd from "@/components/JsonLd";
 import { SITE } from "@/lib/config";
+import { schemaOrganizacion, schemaSitio } from "@/lib/schema";
 
 // Google Tag Manager: cargar SOLO en el dominio real (variable definida en Vercel
 // para Production). Si no, las pruebas en la dirección de prueba contarían como conversiones.
@@ -19,7 +20,14 @@ export const metadata: Metadata = {
     template: "%s | Distribuidora RPM",
   },
   description: SITE.descripcion,
-  openGraph: { siteName: SITE.nombre, locale: "es_PY", type: "website" },
+  // Imagen por defecto al compartir un link (WhatsApp, Facebook, etc.). Los productos usan su foto.
+  openGraph: {
+    siteName: SITE.nombre,
+    locale: "es_PY",
+    type: "website",
+    images: [{ url: "/compartir.png", width: 1200, height: 630, alt: "Distribuidora RPM: librería, limpieza y papelería para empresas" }],
+  },
+  twitter: { card: "summary_large_image", images: ["/compartir.png"] },
   // Solo se indexa cuando RPM_INDEXAR=1 (se activa al pasar al dominio real).
   robots: process.env.RPM_INDEXAR === "1" ? undefined : { index: false, follow: false },
 };
@@ -42,21 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         <WhatsAppFlotante />
         <NavInferior />
-        <JsonLd
-          data={{
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            name: "Distribuidora RPM S.A.",
-            url: SITE.url,
-            contactPoint: {
-              "@type": "ContactPoint",
-              telephone: `+${SITE.whatsapp}`,
-              contactType: "sales",
-              areaServed: "PY",
-              availableLanguage: "es",
-            },
-          }}
-        />
+        <JsonLd data={[schemaOrganizacion(), schemaSitio()]} />
       </body>
     </html>
   );
