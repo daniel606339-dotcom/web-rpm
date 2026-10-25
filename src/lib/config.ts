@@ -41,6 +41,9 @@ export const BANCO = {
   razonSocial: "DISTRIBUIDORA RPM S.A.",
   ruc: "80122009-2",
   emailComprobante: "rcaballero@distribuidorarpm.com.py",
+  // WhatsApp de cobranzas (atiende una persona). OFIMAIA queda para consultas.
+  whatsappCobranzas: "595972680800",
+  whatsappCobranzasVisible: "0972 680 800",
 };
 
 /** Horario de atención del local: el mismo que el Perfil de Empresa de Google. */

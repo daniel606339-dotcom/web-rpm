@@ -69,7 +69,7 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
       {
         titulo: "Transferencia bancaria",
         parrafos: [
-          "Al confirmar el pedido te mostramos los datos de la cuenta y te los enviamos por email. Cuando hagas la transferencia, mandanos el comprobante con el número de pedido por WhatsApp o por email.",
+          "Al confirmar el pedido te mostramos los datos de la cuenta y te los enviamos por email. Cuando hagas la transferencia, subí el comprobante en la misma página del pedido, o mandalo con el número de pedido al WhatsApp de cobranzas (0972 680 800) o por email.",
           "Banco Continental S.A.E.C.A. · Cuenta corriente en guaraníes N° 34-23106000-03 · Alias: RUC 80122009-2 · Titular: DISTRIBUIDORA RPM S.A.",
         ],
       },
@@ -91,7 +91,7 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
       },
       {
         pregunta: "¿Cómo pago mi pedido?",
-        respuesta: "Por transferencia bancaria. Al confirmar el pedido te mostramos los datos de la cuenta y te los enviamos por email; después nos mandás el comprobante con el número de pedido por WhatsApp o por email.",
+        respuesta: "Por transferencia bancaria. Al confirmar el pedido te mostramos los datos de la cuenta y te los enviamos por email; después subís el comprobante en la página del pedido o lo mandás con el número de pedido al WhatsApp de cobranzas (0972 680 800) o por email.",
       },
       {
         pregunta: "¿Los precios incluyen IVA?",

@@ -9,6 +9,7 @@ import { refrescarWeb as refrescar, sb } from "./cliente";
 import Banners from "./Banners";
 import Empresas from "./Empresas";
 import ErpPedido from "./ErpPedido";
+import VerComprobante from "./VerComprobante";
 
 interface Item {
   linea: number;
@@ -48,6 +49,8 @@ interface Pedido {
   erp_mensaje: string | null;
   erp_aprobado_por: string | null;
   erp_enviado_at: string | null;
+  comprobante_path: string | null;
+  comprobante_at: string | null;
   pedido_items: Item[];
 }
 
@@ -259,6 +262,11 @@ function Lista({ email }: { email: string }) {
                 <span className="hidden text-sm text-suave md:block">{fecha(p.creado_at)}</span>
                 <span className="truncate">
                   {p.origen === "portal" && <span className="mr-1.5 rounded bg-marca px-1.5 py-0.5 text-[11px] font-bold text-white">EMPRESA</span>}
+                  {p.comprobante_at && (
+                    <span title="Subió comprobante de pago" className="mr-1.5 rounded bg-ok px-1.5 py-0.5 text-[11px] font-bold text-white">
+                      PAGO
+                    </span>
+                  )}
                   <b>{p.nombre}</b> <span className="text-sm text-suave">· RUC {p.ruc}</span>
                 </span>
                 <span className="hidden truncate text-sm text-suave md:block">{p.localidad}</span>
@@ -367,6 +375,11 @@ function Detalle({
             </a>
           )}
           <p className="mt-2 text-suave">Pago: {p.metodo_pago === "cuenta_cliente" ? "según condiciones del cliente" : p.metodo_pago}</p>
+          {p.comprobante_path ? (
+            <VerComprobante path={p.comprobante_path} cuando={p.comprobante_at} />
+          ) : (
+            p.metodo_pago === "transferencia" && <p className="text-suave">Comprobante: todavía no lo subió.</p>
+          )}
         </div>
         <ErpPedido p={p} onCambio={onRecargar} />
         <label className="block">

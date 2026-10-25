@@ -7,6 +7,8 @@ import { BANCO, HORARIO_ENTREGA, SITE, SUPABASE } from "@/lib/config";
 import { gs, linkWhatsApp } from "@/lib/format";
 import { IconoWhatsApp } from "@/components/iconos";
 import { usePortal } from "@/lib/portal";
+import SubirComprobante from "@/components/SubirComprobante";
+import EnlaceComprobante from "@/components/EnlaceComprobante";
 
 export interface Localidad {
   id: number;
@@ -23,6 +25,7 @@ interface Resultado {
   total?: number;
   localidad?: string;
   tipo?: string;
+  comprobante_token?: string;
   error?: string;
   faltan?: { cod: string; nombre: string; disponible: number }[];
 }
@@ -189,17 +192,24 @@ function CheckoutPublico({ localidades }: { localidades: Localidad[] }) {
           <p>Cuenta: {BANCO.cuenta} ({BANCO.tipo})</p>
           <p>Razón social: {BANCO.razonSocial} · RUC {BANCO.ruc}</p>
           <p className="mt-2">
-            Cuando pagues, enviá el comprobante indicando el pedido <b>{hecho.numero}</b> por WhatsApp o a {BANCO.emailComprobante}.
+            Cuando pagues, subí el comprobante acá abajo. También podés mandarlo indicando el pedido <b>{hecho.numero}</b> al WhatsApp de
+            cobranzas {BANCO.whatsappCobranzasVisible} o a {BANCO.emailComprobante}.
           </p>
         </div>
+        {hecho.comprobante_token && hecho.numero && (
+          <>
+            <SubirComprobante numero={hecho.numero} token={hecho.comprobante_token} />
+            <EnlaceComprobante numero={hecho.numero} token={hecho.comprobante_token} />
+          </>
+        )}
         <div className="flex flex-col gap-2 sm:flex-row">
           <a
-            href={linkWhatsApp(SITE.whatsapp, `Hola RPM, hice el pedido ${hecho.numero} en la web. Les envío el comprobante de transferencia.`)}
+            href={linkWhatsApp(BANCO.whatsappCobranzas, `Hola RPM, hice el pedido ${hecho.numero} en la web. Les envío el comprobante de transferencia.`)}
             target="_blank"
             rel="noopener"
             className="flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-[#25d366] font-bold text-white"
           >
-            <IconoWhatsApp className="size-5" /> Enviar comprobante
+            <IconoWhatsApp className="size-5" /> Enviar por WhatsApp a cobranzas
           </a>
           <Link href="/" className="flex h-12 flex-1 items-center justify-center rounded-lg border border-borde font-semibold">
             Seguir comprando
