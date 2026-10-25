@@ -8,6 +8,7 @@ import { excelPedido } from "@/lib/excelPedido";
 import { refrescarWeb as refrescar, sb } from "./cliente";
 import Banners from "./Banners";
 import Empresas from "./Empresas";
+import ErpPedido from "./ErpPedido";
 
 interface Item {
   linea: number;
@@ -42,6 +43,11 @@ interface Pedido {
   total: number;
   nota_interna: string | null;
   actualizado_por: string | null;
+  erp_estado: "aprobado" | "enviado" | "error" | null;
+  erp_nro: number | null;
+  erp_mensaje: string | null;
+  erp_aprobado_por: string | null;
+  erp_enviado_at: string | null;
   pedido_items: Item[];
 }
 
@@ -259,7 +265,7 @@ function Lista({ email }: { email: string }) {
                 <span className="hidden text-right font-bold md:block">{gs(p.total)}</span>
                 <span className={`rounded-full px-2.5 py-1 text-center text-xs font-bold ${COLOR[p.estado]}`}>{p.estado}</span>
               </button>
-              {abierto === p.id && <Detalle p={p} onCambio={(c) => actualizar(p, c)} />}
+              {abierto === p.id && <Detalle p={p} onCambio={(c) => actualizar(p, c)} onRecargar={cargar} />}
             </li>
           ))}
         </ul>
@@ -280,7 +286,15 @@ function descargarExcel(p: Pedido) {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido, "estado" | "nota_interna">>) => void }) {
+function Detalle({
+  p,
+  onCambio,
+  onRecargar,
+}: {
+  p: Pedido;
+  onCambio: (c: Partial<Pick<Pedido, "estado" | "nota_interna">>) => void;
+  onRecargar: () => void;
+}) {
   const [nota, setNota] = useState(p.nota_interna ?? "");
   const items = [...p.pedido_items].sort((a, b) => a.linea - b.linea);
   return (
@@ -354,6 +368,7 @@ function Detalle({ p, onCambio }: { p: Pedido; onCambio: (c: Partial<Pick<Pedido
           )}
           <p className="mt-2 text-suave">Pago: {p.metodo_pago === "cuenta_cliente" ? "según condiciones del cliente" : p.metodo_pago}</p>
         </div>
+        <ErpPedido p={p} onCambio={onRecargar} />
         <label className="block">
           <span className="mb-1 block font-semibold">Estado</span>
           <select value={p.estado} onChange={(e) => onCambio({ estado: e.target.value })} className="h-10 w-full rounded-lg border border-borde bg-white px-3">
