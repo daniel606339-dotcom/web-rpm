@@ -32,6 +32,7 @@ export function schemaOrganizacion() {
       "@type": "PostalAddress",
       streetAddress: `12 de Octubre N° 521, ${SITE.entreCalles}, Barrio Pinozá`,
       addressLocality: SITE.ciudad,
+      postalCode: "001236",
       addressCountry: SITE.pais,
     },
     geo: { "@type": "GeoCoordinates", latitude: SITE.geo.lat, longitude: SITE.geo.lng },
