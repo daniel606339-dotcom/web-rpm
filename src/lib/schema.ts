@@ -1,4 +1,4 @@
-import { SITE } from "./config";
+import { HORARIO_ATENCION, SITE } from "./config";
 
 /**
  * Datos estructurados (schema.org) de la empresa. Le dicen a Google y a las IA
@@ -24,18 +24,25 @@ export function schemaOrganizacion() {
     logo: `${SITE.url}/logo.png`,
     image: `${SITE.url}/compartir.png`,
     email: SITE.email,
-    telephone: `+${SITE.whatsapp}`,
+    telephone: `+${SITE.telefono}`,
     taxID: SITE.ruc,
     foundingDate: SITE.fundacion,
     currenciesAccepted: SITE.moneda,
     address: {
       "@type": "PostalAddress",
-      streetAddress: "12 de Octubre N° 521, Barrio Pinozá",
+      streetAddress: `12 de Octubre N° 521, ${SITE.entreCalles}, Barrio Pinozá`,
       addressLocality: SITE.ciudad,
+      postalCode: "001236",
       addressCountry: SITE.pais,
     },
     geo: { "@type": "GeoCoordinates", latitude: SITE.geo.lat, longitude: SITE.geo.lng },
     hasMap: `https://www.google.com/maps?q=${SITE.geo.lat},${SITE.geo.lng}`,
+    openingHoursSpecification: HORARIO_ATENCION.map((h) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: h.dias,
+      opens: h.abre,
+      closes: h.cierra,
+    })),
     areaServed: { "@type": "Country", name: "Paraguay" },
     sameAs: SITE.redes.map((r) => r.url),
     contactPoint: {

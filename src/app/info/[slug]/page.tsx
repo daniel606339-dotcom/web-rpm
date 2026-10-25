@@ -50,7 +50,7 @@ const PAGINAS: Record<string, { titulo: string; descripcion?: string; bloques?: 
       },
       {
         pregunta: "¿Puedo retirar el pedido yo mismo?",
-        respuesta: `Sí. El retiro no tiene costo y el pedido queda listo en 2 horas en nuestro depósito de ${SITE.direccion}.`,
+        respuesta: `Sí. El retiro no tiene costo y el pedido queda listo en 2 horas en nuestro depósito de 12 de Octubre N° 521 (${SITE.entreCalles}), Barrio Pinozá, Asunción, en el horario de atención: lunes a viernes de 8:00 a 17:00 y sábados de 8:00 a 12:00.`,
       },
       {
         pregunta: "¿Hacen envíos al interior del país?",
