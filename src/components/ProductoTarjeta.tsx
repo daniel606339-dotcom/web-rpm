@@ -2,15 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ProductoResumen } from "@/lib/data";
 import { SITE } from "@/lib/config";
-import { disponibles, linkWhatsApp, urlProducto } from "@/lib/format";
+import { disponibles, urlProducto } from "@/lib/format";
 import { PrecioTarjeta } from "./PrecioCliente";
+import BotonTarjeta from "./BotonTarjeta";
 
 export default function ProductoTarjeta({ p, prioridad = false }: { p: ProductoResumen; prioridad?: boolean }) {
   const hayStock = (p.cant_dispon ?? 0) > 0;
   const url = urlProducto(p);
-  const msg = hayStock
-    ? `Hola RPM, quiero pedir: ${p.nombre} (cód. ${p.cod_articulo})`
-    : `Hola RPM, quiero consultar disponibilidad de ${p.nombre} (cód. ${p.cod_articulo})`;
   return (
     <article className="group flex h-full w-full flex-col overflow-hidden rounded-xl border border-borde bg-white transition hover:border-marca/40 hover:shadow-md">
       <Link href={url} className="relative block aspect-square w-full bg-white" tabIndex={-1} aria-hidden>
@@ -38,14 +36,15 @@ export default function ProductoTarjeta({ p, prioridad = false }: { p: ProductoR
           {hayStock ? `● ${disponibles(p.cant_dispon)}` : "Sin stock"}
         </span>
         <PrecioTarjeta cod={p.cod_articulo} precio={p.precio_venta} />
-        <a
-          href={linkWhatsApp(SITE.whatsapp, msg)}
-          target="_blank"
-          rel="noopener"
-          className="mt-auto flex h-10 items-center justify-center rounded-lg bg-[#177a3b] text-sm font-bold text-white hover:bg-[#12662f]"
-        >
-          Pedir por WhatsApp
-        </a>
+        <BotonTarjeta
+          cod={p.cod_articulo}
+          nombre={p.nombre}
+          precio={p.precio_venta}
+          foto={p.foto_url}
+          url={url}
+          stock={Math.floor(p.cant_dispon ?? 0)}
+          whatsapp={SITE.whatsapp}
+        />
       </div>
     </article>
   );

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { agregar, useCarrito } from "./carrito";
 import { IconoWhatsApp } from "./iconos";
-import { gs, linkWhatsApp } from "@/lib/format";
+import { linkWhatsApp } from "@/lib/format";
 
 interface Props {
   cod: string;
@@ -30,8 +30,6 @@ export default function AgregarCarrito({ cod, nombre, precio, foto, url, whatsap
       const n = typeof f === "function" ? f(c) : f;
       return Math.max(1, Math.min(n, Math.max(1, restante)));
     });
-
-  const mensaje = `Hola RPM, quiero pedir:\n${cantidad} x ${nombre} (cód. ${cod})${precio ? ` – ${gs(precio)} c/u` : ""}`;
 
   return (
     <div className="space-y-3">
@@ -104,13 +102,16 @@ export default function AgregarCarrito({ cod, nombre, precio, foto, url, whatsap
       )}
 
       <a
-        href={linkWhatsApp(whatsapp, hayStock ? mensaje : `Hola RPM, quiero consultar disponibilidad de ${nombre} (cód. ${cod}).`)}
+        href={linkWhatsApp(
+          whatsapp,
+          hayStock ? `Hola RPM, tengo una consulta sobre ${nombre} (cód. ${cod}).` : `Hola RPM, quiero consultar disponibilidad de ${nombre} (cód. ${cod}).`,
+        )}
         target="_blank"
         rel="noopener"
-        className="flex h-12 items-center justify-center gap-2 rounded-lg border-2 border-[#25d366] font-semibold text-[#128c4a] hover:bg-[#25d366]/10"
+        className="flex h-10 items-center justify-center gap-2 text-sm font-semibold text-[#128c4a] hover:underline"
       >
         <IconoWhatsApp className="size-5" />
-        {hayStock ? "Pedir por WhatsApp" : "Consultar por WhatsApp"}
+        {hayStock ? "¿Dudas? Consultanos por WhatsApp" : "Consultar disponibilidad por WhatsApp"}
       </a>
     </div>
   );

@@ -37,10 +37,7 @@ function CarritoPublico({ envioDesde }: { envioDesde: number | null }) {
     );
   }
 
-  const mensaje =
-    "Hola RPM, quiero hacer este pedido:\n" +
-    items.map((x) => `• ${x.cantidad} x ${x.nombre} (cód. ${x.cod})${x.precio ? ` – ${gs(x.precio * x.cantidad)}` : ""}`).join("\n") +
-    `\n\nTotal estimado: ${gs(total)}`;
+  const mensaje = "Hola RPM, tengo una consulta sobre mi carrito en la web.";
 
   const falta = MINIMO_ENVIO > 0 ? Math.max(0, MINIMO_ENVIO - total) : 0;
 
@@ -120,9 +117,9 @@ function CarritoPublico({ envioDesde }: { envioDesde: number | null }) {
           href={linkWhatsApp(SITE.whatsapp, mensaje)}
           target="_blank"
           rel="noopener"
-          className="flex h-11 items-center justify-center gap-2 rounded-lg border-2 border-[#25d366] text-sm font-bold text-[#128c4a] hover:bg-[#25d366]/10"
+          className="flex h-10 items-center justify-center gap-2 text-sm font-semibold text-[#128c4a] hover:underline"
         >
-          <IconoWhatsApp className="size-5" /> O enviar el pedido por WhatsApp
+          <IconoWhatsApp className="size-5" /> ¿Dudas? Consultanos por WhatsApp
         </a>
         <button onClick={vaciar} className="text-xs text-suave underline">
           Vaciar carrito
