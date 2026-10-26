@@ -18,7 +18,7 @@ export default function NavInferior() {
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed inset-x-0 bottom-0 z-40 grid h-16 grid-cols-4 border-t border-borde bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="no-print-fijo fixed inset-x-0 bottom-0 z-40 grid h-16 grid-cols-4 border-t border-borde bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       {items.map(({ href, texto, Icono, activo, badge }) => (
         <Link

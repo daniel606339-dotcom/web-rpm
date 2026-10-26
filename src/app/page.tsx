@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getBanners, getCategoriaConFoto, getMenu, getProductosPorCodigo, getRubros } from "@/lib/data";
-import { SITE } from "@/lib/config";
 import { CATEGORIAS_BUSCADAS, LO_MAS_PEDIDO } from "@/lib/inicio";
-import { linkWhatsApp } from "@/lib/format";
 import Carrusel from "@/components/Carrusel";
 import ProductoTarjeta from "@/components/ProductoTarjeta";
 import Beneficios from "@/components/Beneficios";
@@ -172,14 +170,12 @@ export default async function Inicio() {
             </p>
           </div>
           <div className="flex shrink-0 gap-2 md:gap-3">
-            <a
-              href={linkWhatsApp(SITE.whatsapp, "Hola RPM, quiero pedir un presupuesto para mi empresa.")}
-              target="_blank"
-              rel="noopener"
+            <Link
+              href="/presupuesto/nuevo"
               className="flex h-11 items-center rounded-[10px] border-[1.5px] border-white px-4 text-sm font-bold md:h-12 md:px-5 md:text-[15px]"
             >
               Pedir presupuesto
-            </a>
+            </Link>
             <Link
               href="/empresas"
               className="flex h-11 items-center rounded-[10px] bg-white px-4 text-sm font-bold text-marca md:h-12 md:px-5 md:text-[15px]"

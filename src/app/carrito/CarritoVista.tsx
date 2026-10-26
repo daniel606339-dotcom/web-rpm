@@ -113,6 +113,12 @@ function CarritoPublico({ envioDesde }: { envioDesde: number | null }) {
           Finalizar compra
         </Link>
         <p className="text-center text-xs text-suave">Sin crear cuenta · Pago por transferencia</p>
+        <Link
+          href="/presupuesto/nuevo"
+          className="flex h-11 items-center justify-center rounded-lg border-2 border-marca text-sm font-bold text-marca hover:bg-marca/5"
+        >
+          Pedir presupuesto con estos productos
+        </Link>
         <a
           href={linkWhatsApp(SITE.whatsapp, mensaje)}
           target="_blank"

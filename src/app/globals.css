@@ -59,3 +59,15 @@ h3 {
   visibility: hidden !important;
   opacity: 0 !important;
 }
+
+/* Impresión del presupuesto (A4): solo la hoja, sin el resto del sitio */
+@media print {
+  @page { size: A4; margin: 10mm 0 0 0; }
+  @page :first { margin: 0; }
+  html, body { background: #fff !important; padding: 0 !important; }
+  header, footer, nav, .no-print, .no-print-fijo { display: none !important; }
+  .zona-impresion { padding: 0 !important; margin: 0 !important; max-width: none !important; width: auto !important; }
+  .contenedor-hoja { padding: 0 !important; background: none !important; overflow: visible !important; border-radius: 0 !important; }
+  .contenedor-hoja > div { box-shadow: none !important; margin: 0 !important; }
+  .hoja-presupuesto { width: 210mm !important; min-height: 297mm !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

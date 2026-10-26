@@ -125,6 +125,12 @@ export default function CarritoPortal({ cuenta }: { cuenta: Cuenta }) {
         >
           Continuar con el pedido
         </Link>
+        <Link
+          href="/presupuesto/nuevo"
+          className="flex h-11 items-center justify-center rounded-lg border-2 border-marca text-sm font-bold text-marca hover:bg-marca/5"
+        >
+          Pedir presupuesto con estos productos
+        </Link>
         <button onClick={guardar} disabled={guardando} className="h-11 w-full rounded-lg border border-borde text-sm font-semibold hover:border-marca">
           {guardando ? "Guardando…" : "Guardar este carrito para repetirlo"}
         </button>

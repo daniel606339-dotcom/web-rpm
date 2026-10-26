@@ -24,14 +24,9 @@ export default async function Header() {
             <a href={wa} target="_blank" rel="noopener" className="hover:text-white">
               WhatsApp {SITE.whatsappVisible}
             </a>
-            <a
-              href={linkWhatsApp(SITE.whatsapp, "Hola RPM, quiero pedir un presupuesto para mi empresa.")}
-              target="_blank"
-              rel="noopener"
-              className="hover:text-white"
-            >
+            <Link href="/presupuesto/nuevo" className="hover:text-white">
               Pedir presupuesto
-            </a>
+            </Link>
             <Link href="/empresas" className="font-bold text-white">
               Ingresar como empresa
             </Link>

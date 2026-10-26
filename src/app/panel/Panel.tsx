@@ -8,6 +8,7 @@ import { excelPedido } from "@/lib/excelPedido";
 import { refrescarWeb as refrescar, sb } from "./cliente";
 import Banners from "./Banners";
 import Empresas from "./Empresas";
+import Presupuestos from "./Presupuestos";
 import ErpPedido from "./ErpPedido";
 import VerComprobante from "./VerComprobante";
 
@@ -92,7 +93,7 @@ export default function Panel() {
 }
 
 function Secciones({ email }: { email: string }) {
-  const [seccion, setSeccion] = useState<"pedidos" | "empresas" | "banners">("pedidos");
+  const [seccion, setSeccion] = useState<"pedidos" | "presupuestos" | "empresas" | "banners">("pedidos");
   const tab = (s: typeof seccion, texto: string) => (
     <button
       onClick={() => setSeccion(s)}
@@ -105,10 +106,19 @@ function Secciones({ email }: { email: string }) {
     <>
       <div className="contenedor flex gap-1 border-b border-borde pt-3">
         {tab("pedidos", "Pedidos")}
+        {tab("presupuestos", "Presupuestos")}
         {tab("empresas", "Empresas")}
         {tab("banners", "Banners")}
       </div>
-      {seccion === "pedidos" ? <Lista email={email} /> : seccion === "empresas" ? <Empresas /> : <Banners email={email} />}
+      {seccion === "pedidos" ? (
+        <Lista email={email} />
+      ) : seccion === "presupuestos" ? (
+        <Presupuestos email={email} />
+      ) : seccion === "empresas" ? (
+        <Empresas />
+      ) : (
+        <Banners email={email} />
+      )}
     </>
   );
 }
