@@ -68,7 +68,7 @@ export default function VerPresupuesto({ numero }: { numero: string }) {
         {nuevo && (
           <div className="rounded-2xl border border-ok/30 bg-ok/10 p-4">
             <p className="font-bold text-ok">✓ Tu presupuesto {p.numero} está listo</p>
-            <p className="mt-1 text-sm">Descargalo en PDF o guardá este enlace: desde acá podés convertirlo en pedido cuando quieras.</p>
+            <p className="mt-1 text-sm">En unos minutos te llega también por correo. Desde acá podés descargarlo en PDF y convertirlo en pedido cuando quieras.</p>
           </div>
         )}
         {vencido && (
