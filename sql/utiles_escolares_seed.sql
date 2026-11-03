@@ -1,0 +1,150 @@
+-- Carga inicial: 18 listas 2026 del piloto (CPP Luque y Santa Teresa de Jesús). Generado el 03/11/2026.
+
+-- Textos redactados por RPM (no copiados de la lista) y notas pensadas para el padre: revisar antes de difundir.
+
+insert into web.utiles_colegios (slug,nombre,nombre_corto,cod_institucion_mec,distrito,barrio,lat,lng) values
+('colegio-presbiteriano-del-paraguay','Colegio Presbiteriano del Paraguay','CPP',10969,'Luque','Isla Bogado',-25.287305,-57.499838),
+('colegio-santa-teresa-de-jesus','Colegio Santa Teresa de Jesús','Santa Teresa',353,'Asunción','San Roque',-25.287707,-57.622073);
+
+insert into web.utiles_listas (colegio_id,anio,grado,grado_slug,grado_orden,fuente_url,publicada)
+select c.id,2026,v.g,v.gs,v.o,v.f,true from (values
+('colegio-presbiteriano-del-paraguay','Pre jardín','pre-jardin',1,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-pre-jardin-26.pdf'),
+('colegio-presbiteriano-del-paraguay','Jardín','jardin',2,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-jardin-26.pdf'),
+('colegio-presbiteriano-del-paraguay','Preescolar','preescolar',3,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-preescolar-26.pdf'),
+('colegio-presbiteriano-del-paraguay','1er grado','1er-grado',4,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-1er-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','2do grado','2do-grado',5,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-2do-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','3er grado','3er-grado',6,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-3er-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','4to grado','4to-grado',7,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-4to-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','5to grado','5to-grado',8,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-5to-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','6to grado','6to-grado',9,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-6to-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','7mo grado','7mo-grado',10,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-7mo-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','8vo grado','8vo-grado',11,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-8vo-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','9no grado','9no-grado',12,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-9no-grado-26.pdf'),
+('colegio-presbiteriano-del-paraguay','1er curso','1er-curso',13,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-1er-curso-26.pdf'),
+('colegio-presbiteriano-del-paraguay','2do curso','2do-curso',14,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-2do-curso-26.pdf'),
+('colegio-presbiteriano-del-paraguay','3er curso','3er-curso',15,'https://www.colegiocpp.com/wp-content/uploads/2026/01/Lista-de-utiles-3er-curso-26.pdf'),
+('colegio-santa-teresa-de-jesus','7mo grado','7mo-grado',10,'https://www.stj.edu.py/wp-content/uploads/2025/12/Lista-de-utiles-Tercer-Ciclo-2026.pdf'),
+('colegio-santa-teresa-de-jesus','8vo grado','8vo-grado',11,'https://www.stj.edu.py/wp-content/uploads/2025/12/Lista-de-utiles-Tercer-Ciclo-2026.pdf'),
+('colegio-santa-teresa-de-jesus','9no grado','9no-grado',12,'https://www.stj.edu.py/wp-content/uploads/2025/12/Lista-de-utiles-Tercer-Ciclo-2026.pdf')
+) v(cs,g,gs,o,f) join web.utiles_colegios c on c.slug=v.cs;
+
+with n(k,t,cod,alt,co,nota) as (values
+('lapiz_papel','Lápiz de papel','LAPCONPUR',null,'igual',null),
+('goma_blanca','Goma de borrar blanca grande','1008420',null,'igual',null),
+('sacapuntas','Sacapuntas','0000000000043',null,'igual',null),
+('tijera','Tijera escolar punta chata','9153745',null,'igual',null),
+('colores_faber12','Lápices de colores Faber x12 largos','7891360638681',null,'equivalente','Ofrecemos Faber versión corta'),
+('crayones_faber12','Crayones Faber x12 largos','HT141112EX','8851934710082','equivalente','Ofrecemos Faber Jumbo'),
+('marc_jumbo12','Marcadores jumbo x12 (''pincel jumbo'')','MARESCJUMCOM12COL',null,'igual',null),
+('marc_perm_negro','Marcador permanente negro','ESPDELGRAN',null,'igual',null),
+('plastilina_soft','Plastilina Acrilex Soft (pote)','7891153073217',null,'igual',null),
+('pincel12','Pincel/brocha n° 12 chata','7891395012142',null,'igual',null),
+('palitos','Palitos de asadito (paquete)',null,null,'sin_catalogo',null),
+('cinta_embalaje','Cinta de embalaje ancha','0000000000170',null,'igual',null),
+('silicona250','Silicona líquida 250 ml','R11644',null,'igual',null),
+('adh_liquido','Plasticola / isocola líquida (80–120 ml)','0000000000469',null,'equivalente','Ofrecemos 40 g'),
+('tempera12','Témperas x12','R11316',null,'igual',null),
+('tempera_pote','Témpera pote grande (250 ml)','7897254121703',null,'igual',null),
+('marc_pizarra','Marcador de pizarra azul','1008650',null,'igual',null),
+('plancheta','Plancheta oficio','0000000000291',null,'igual',null),
+('folio','Folio oficio (unidad)','BORALACEL',null,'igual',null),
+('hojas_oficio100','Hojas blancas oficio x100','0000000000650',null,'igual',null),
+('cuad_dr50','Cuaderno 50 h doble raya tapa dura',null,null,'sin_catalogo',null),
+('biblio_fino','Bibliorato lomo fino color','113327','0000000000783','igual',null),
+('maletin','Maletín plástico grande con manija','7897027202134',null,'equivalente','Consultanos el color disponible'),
+('cartuchera','Cartuchera','0744.3',null,'igual',null),
+('papel_cocina','Papel de cocina (2 rollos)','7896026800754',null,'igual',null),
+('toallitas_hum','Toallitas húmedas','NR100516',null,'igual',null),
+('jabon_liq','Jabón líquido','CP54169-6B',null,'igual',null),
+('alcohol_gel','Alcohol en gel','7840849013778',null,'igual',null),
+('vaso','Vaso plástico','0000000000627',null,'igual',null),
+('adh_barra','Adhesivo en barra grande','4893055800017',null,'equivalente','Ofrecemos barra de 9 g'),
+('regla30','Regla 30 cm','PR91030',null,'igual',null),
+('colores_acuarel','Lápices de colores acuarelables x12','1472F',null,'igual',null),
+('pincel4','Pincel n° 4','7891055167427',null,'igual',null),
+('pincel10','Pincel n° 10','7891395012135',null,'igual',null),
+('carpeta_archiv','Carpeta archivadora','R11744',null,'igual',null),
+('hojas_doble_raya','Hojas doble raya para carpeta',null,null,'sin_catalogo',null),
+('forro','Papel para forrar (contact color)','0000000000634',null,'equivalente','Ofrecemos papel contact de color'),
+('cuad_dr200','Cuaderno 200 h doble raya tapa dura','ESCOLARHTONE2RAZUL',null,'equivalente',null),
+('cuad_esc50_cuad','Cuaderno chico 50 h cuadriculado','ZX5688',null,'equivalente','Ofrecemos 48 hojas en lugar de 50'),
+('dicc_esp','Diccionario español','3968',null,'igual',null),
+('dicc_guarani','Diccionario guaraní','DICGUAÑEE',null,'igual',null),
+('flauta','Flauta dulce Yamaha',null,null,'sin_catalogo',null),
+('colores12','Lápices de colores x12','7891360638681','7891360577546','igual',null),
+('cuad_dr100','Cuaderno 100 h doble raya tapa dura',null,null,'sin_catalogo',null),
+('cuad_esc100_1r','Cuaderno chico 100 h 1 raya','HTONE1R96AZUL',null,'equivalente','Ofrecemos 96 hojas en lugar de 100'),
+('cuad_esc50_1r','Cuaderno chico 50 h 1 raya','7841566000201',null,'equivalente','Ofrecemos 48 hojas en lugar de 50'),
+('resaltador','Resaltador flúor','HT805BLUE',null,'igual',null),
+('bic_negro','Bolígrafo negro','R11481',null,'igual',null),
+('bic_azul','Bolígrafo azul','R11482',null,'igual',null),
+('corrector','Cinta correctora','1008478',null,'igual',null),
+('dicc_sinon','Diccionario sinónimos y antónimos','9789686321289',null,'igual',null),
+('pincel16','Brocha n° 16 chata','PINCTIGN16',null,'igual',null),
+('calc_cient','Calculadora científica','FX82ES',null,'equivalente','Ofrecemos Casio fx-82'),
+('candado','Candado con llave','866863',null,'igual',null),
+('hojas_dibujo2','Hojas de dibujo N°2 (25 u)','7840294002235',null,'igual',null),
+('carpeta_dibujo2','Carpeta de dibujo N°2','CARDIBALANUM2',null,'igual',null),
+('cuad_univ100_1r','Cuaderno universitario 100 h 1 raya','HALCON96NEGRO',null,'equivalente','Ofrecemos 96 hojas en lugar de 100'),
+('cuad_univ100_cuad','Cuaderno universitario 100 h cuadriculado','HALCONCUADR96NEGR',null,'equivalente','Ofrecemos 96 hojas en lugar de 100'),
+('cuad_univ50_1r','Cuaderno universitario 50 h 1 raya','HALCONEGR',null,'equivalente','Ofrecemos 48 hojas en lugar de 50'),
+('carpeta_td_oficio','Carpeta tapa dura oficio','LW320BFA',null,'igual',null),
+('hojas_oficio_1raya','Hojas oficio 1 raya x50','IBAM04047',null,'igual',null),
+('cuad_univ50_cuad','Cuaderno universitario 50 h cuadriculado','R11992',null,'equivalente','Ofrecemos 48 hojas en lugar de 50'),
+('tabla_periodica','Tabla periódica','0000000001034',null,'igual',null),
+('cuad_dr150','Cuaderno 150 h doble raya',null,null,'sin_catalogo',null),
+('bloc','Bloc de notas','7840303318173',null,'equivalente',null),
+('biblio_ancho','Bibliorato lomo ancho','0000000000960',null,'igual',null),
+('compas','Compás','COMPFABER740',null,'igual',null),
+('transportador','Transportador','3154141463600',null,'igual',null),
+('repuesto_univ','Hojas cambiables univ. 1 raya (50 h)','005024R',null,'equivalente','Repuesto de 50 hojas'),
+('sacapuntas_dep','Sacapuntas con depósito','1008471',null,'igual',null),
+('banderitas','Notas/banderitas resaltadoras','3603',null,'igual',null),
+('lapiz_2b','Lápiz 2B','7891360548300',null,'equivalente',null),
+('marc12','Marcadores punta mediana x12','6937544337184',null,'igual',null),
+('marc_superfino','Marcador negro superfino','7896979501227',null,'igual',null),
+('tempera_suelta','Témpera suelta (por color)','7897254121703',null,'equivalente','Pote de 250 ml por color'),
+('pincel8','Pincel n° 8','7891395012128',null,'igual',null),
+('pincel2','Pincel n° 2','7891395012098',null,'igual',null),
+('cinta_aisladora','Cinta aisladora','0000000000941',null,'igual',null),
+('cinta_transp','Cinta adhesiva transparente gruesa','0000000000112',null,'igual',null),
+('repuesto_cuad','Hojas cambiables univ. cuadriculadas',null,null,'sin_catalogo',null),
+('plastilina','Plastilina caja','R11107',null,'igual',null),
+('goma_eva','Goma eva (hoja)','R11254',null,'igual',null),
+('cartulina_blanca','Cartulina blanca','0000000000599',null,'igual',null),
+('silicona_fria','Silicona fría','980628',null,'igual',null)
+),
+-- por lista: 'necesidad*cantidad' separados por espacio; ítems fuera de presupuesto separados por |
+l0(cs,gs,u,f) as (values
+('resb','pre-jardin','lapiz_papel*2 goma_blanca*2 sacapuntas*2 tijera*1 colores_faber12*1 crayones_faber12*1 marc_jumbo12*1 marc_perm_negro*1 plastilina_soft*2 pincel12*1 palitos*1 cinta_embalaje*1 silicona250*1 adh_liquido*1 tempera12*1 tempera_pote*1 marc_pizarra*1 plancheta*1 folio*10 hojas_oficio100*1 cuad_dr50*1 biblio_fino*1 maletin*1 cartuchera*1 papel_cocina*1 toallitas_hum*1 jabon_liq*1 alcohol_gel*1 vaso*1','Juego didáctico (bloques/ábaco)|Libro de cuento|Delantal de tela|Individual|Juguete para arenero|Toallitas de tela|Botella de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','jardin','lapiz_papel*2 goma_blanca*2 sacapuntas*2 tijera*1 colores_faber12*1 crayones_faber12*1 marc_jumbo12*1 marc_perm_negro*1 plastilina_soft*2 pincel12*1 palitos*1 cinta_embalaje*1 silicona250*1 adh_liquido*1 tempera12*1 tempera_pote*1 marc_pizarra*1 plancheta*1 folio*10 hojas_oficio100*1 cuad_dr50*2 biblio_fino*1 maletin*1 cartuchera*1 papel_cocina*1 toallitas_hum*1 jabon_liq*1 alcohol_gel*1 vaso*1','Juego didáctico (bloques/ábaco)|Libro de cuento|Delantal de tela|Individual|Juguete para arenero|Toallitas de tela|Botella de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','preescolar','lapiz_papel*2 goma_blanca*2 sacapuntas*2 tijera*1 colores_faber12*1 crayones_faber12*1 marc_jumbo12*1 marc_perm_negro*1 plastilina_soft*2 pincel12*1 palitos*1 cinta_embalaje*1 silicona250*1 adh_liquido*1 tempera12*1 tempera_pote*1 marc_pizarra*1 plancheta*1 folio*10 hojas_oficio100*1 cuad_dr50*2 biblio_fino*1 maletin*1 cartuchera*1 papel_cocina*1 toallitas_hum*1 jabon_liq*1 alcohol_gel*1 vaso*1','Juego didáctico (bloques/ábaco)|Libro de cuento|Delantal de tela|Individual|Juguete para arenero|Toallitas de tela|Botella de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','1er-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 tijera*1 adh_barra*1 regla30*1 cartuchera*1 colores_acuarel*1 tempera12*1 pincel4*1 pincel10*1 vaso*1 toallitas_hum*1 adh_liquido*1 carpeta_archiv*1 hojas_oficio100*1 hojas_doble_raya*1 forro*1 cuad_dr200*1 cuad_dr50*4 papel_cocina*1 jabon_liq*1 alcohol_gel*1','Delantal plástico|Caja de zapatos|Toallitas de tela|Individual|Botella/vaso de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','2do-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 tijera*1 adh_barra*1 regla30*1 cartuchera*1 colores_acuarel*1 tempera12*1 pincel4*1 pincel10*1 vaso*1 toallitas_hum*1 adh_liquido*1 carpeta_archiv*1 hojas_oficio100*1 hojas_doble_raya*1 forro*1 cuad_dr200*1 cuad_dr50*4 papel_cocina*1 jabon_liq*1 alcohol_gel*1','Delantal plástico|Caja de zapatos|Toallitas de tela|Individual|Botella/vaso de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','3er-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 tijera*1 adh_barra*1 regla30*1 cartuchera*1 colores_acuarel*1 tempera12*1 pincel4*1 pincel10*1 vaso*1 toallitas_hum*1 adh_liquido*1 carpeta_archiv*1 hojas_oficio100*1 hojas_doble_raya*1 forro*1 cuad_dr200*1 cuad_dr50*4 cuad_esc50_cuad*1 dicc_esp*1 dicc_guarani*1 papel_cocina*1 jabon_liq*1 alcohol_gel*1 flauta*1','Delantal plástico|Caja de zapatos|Toallitas de tela|Individual|Botella/vaso de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','4to-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 tijera*1 adh_barra*1 regla30*1 cartuchera*1 colores12*1 cuad_dr100*1 cuad_dr50*8 cuad_esc50_cuad*1 forro*1 papel_cocina*1 jabon_liq*1 alcohol_gel*1','Toallita|Botella/vaso de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','5to-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 tijera*1 adh_barra*1 regla30*1 cartuchera*1 colores12*1 cuad_esc100_1r*1 cuad_esc50_1r*8 cuad_esc50_cuad*1 forro*1 papel_cocina*1 jabon_liq*1 alcohol_gel*1','Toallita|Botella/vaso de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','6to-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 tijera*1 adh_barra*1 regla30*1 cartuchera*1 colores12*1 cuad_esc100_1r*1 cuad_esc50_1r*8 cuad_esc50_cuad*1 forro*1 papel_cocina*1 jabon_liq*1 alcohol_gel*1','Toallita|Botella/vaso de agua|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','7mo-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 adh_liquido*1 colores_acuarel*1 resaltador*1 bic_negro*1 bic_azul*1 regla30*1 corrector*1 dicc_esp*1 dicc_sinon*1 dicc_guarani*1 pincel12*1 pincel16*1 calc_cient*1 candado*1 forro*1 flauta*1 hojas_dibujo2*1 carpeta_dibujo2*1 cuad_univ100_1r*2 cuad_univ100_cuad*1 cuad_univ50_1r*7','Toallitas, cepillo y crema dental|Botella de agua|Bata de laboratorio|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','8vo-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 adh_liquido*1 colores_acuarel*1 resaltador*1 bic_negro*1 bic_azul*1 regla30*1 corrector*1 dicc_esp*1 dicc_sinon*1 dicc_guarani*1 pincel12*1 pincel16*1 calc_cient*1 candado*1 forro*1 flauta*1 hojas_dibujo2*1 carpeta_dibujo2*1 cuad_univ100_1r*2 cuad_univ100_cuad*1 cuad_univ50_1r*7','Toallitas, cepillo y crema dental|Botella de agua|Bata de laboratorio|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','9no-grado','lapiz_papel*1 goma_blanca*1 sacapuntas*1 adh_liquido*1 colores_acuarel*1 resaltador*1 bic_negro*1 bic_azul*1 regla30*1 corrector*1 dicc_esp*1 dicc_sinon*1 dicc_guarani*1 pincel12*1 pincel16*1 calc_cient*1 candado*1 forro*1 flauta*1 hojas_dibujo2*1 carpeta_dibujo2*1 cuad_univ100_1r*2 cuad_univ100_cuad*1 cuad_univ50_1r*7','Toallitas, cepillo y crema dental|Botella de agua|Bata de laboratorio|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','1er-curso','lapiz_papel*1 goma_blanca*1 sacapuntas*1 adh_liquido*1 colores_acuarel*1 resaltador*1 bic_negro*1 bic_azul*1 regla30*1 corrector*1 dicc_esp*1 dicc_sinon*1 dicc_guarani*1 pincel12*1 pincel16*1 calc_cient*1 candado*1 forro*1 hojas_dibujo2*1 carpeta_dibujo2*1 carpeta_td_oficio*1 hojas_oficio_1raya*1 cuad_univ100_1r*1 cuad_univ50_1r*8 cuad_univ50_cuad*3','Toallitas, cepillo y crema dental|Botella de agua|Bata de laboratorio|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','2do-curso','lapiz_papel*1 goma_blanca*1 sacapuntas*1 adh_liquido*1 colores_acuarel*1 resaltador*1 bic_negro*1 bic_azul*1 regla30*1 corrector*1 dicc_esp*1 dicc_sinon*1 dicc_guarani*1 pincel12*1 pincel16*1 calc_cient*1 candado*1 forro*1 hojas_dibujo2*1 carpeta_dibujo2*1 carpeta_td_oficio*1 hojas_oficio_1raya*1 cuad_univ100_1r*1 cuad_univ50_1r*8 cuad_univ50_cuad*4','Toallitas, cepillo y crema dental|Botella de agua|Bata de laboratorio|Kit de libros (venta en el colegio)|Uniformes'),
+('resb','3er-curso','lapiz_papel*1 goma_blanca*1 sacapuntas*1 adh_liquido*1 colores_acuarel*1 resaltador*1 bic_negro*1 bic_azul*1 regla30*1 corrector*1 dicc_esp*1 dicc_sinon*1 dicc_guarani*1 pincel12*1 pincel16*1 calc_cient*1 candado*1 forro*1 tabla_periodica*1 carpeta_td_oficio*1 hojas_oficio_1raya*1 cuad_univ100_1r*2 cuad_univ50_1r*7 cuad_univ50_cuad*4','Toallitas, cepillo y crema dental|Botella de agua|Bata de laboratorio|Kit de libros (venta en el colegio)|Uniformes'),
+('anta','7mo-grado','cuad_dr150*1 bloc*1 biblio_ancho*1 lapiz_papel*1 goma_blanca*1 bic_azul*1 regla30*1 compas*1 transportador*1 repuesto_univ*4 sacapuntas_dep*1 resaltador*1 banderitas*1 colores_acuarel*1 adh_liquido*1 carpeta_archiv*1 hojas_oficio_1raya*1 lapiz_2b*1 marc12*1 marc_superfino*1 tempera_suelta*5 pincel12*1 pincel8*1 pincel2*1 cuad_univ50_1r*2 cuad_dr50*1 cinta_aisladora*1 cinta_transp*1','Libros de texto (Santillana, Alianza, Emina Nasser, etc.)|Bata de laboratorio|Buzo y remera del colegio|Cuadernillos de Feria de Ciencias|Recipientes y tela para pinceles|Inglés y CES (librería del colegio)|Herramientas: destornilladores, buscapolo, pinza, pelacable, cable, caja'),
+('anta','8vo-grado','cuad_dr150*1 bloc*1 biblio_ancho*1 lapiz_papel*1 goma_blanca*1 bic_azul*1 regla30*1 compas*1 transportador*1 repuesto_univ*4 sacapuntas_dep*1 resaltador*1 banderitas*1 colores_acuarel*1 adh_liquido*1 carpeta_archiv*1 hojas_oficio_1raya*1 lapiz_2b*1 marc12*1 marc_superfino*1 tempera_suelta*5 pincel12*1 pincel8*1 pincel2*1 cuad_univ50_1r*2 cuad_dr50*1','Libros de texto (Santillana, Alianza, Emina Nasser, etc.)|Bata de laboratorio|Buzo y remera del colegio|Cuadernillos de Feria de Ciencias|Recipientes y tela para pinceles|Inglés y CES (librería del colegio)'),
+('anta','9no-grado','cuad_dr150*1 bloc*1 biblio_ancho*1 lapiz_papel*1 goma_blanca*1 bic_azul*1 regla30*1 compas*1 transportador*1 sacapuntas_dep*1 resaltador*1 banderitas*1 colores_acuarel*1 adh_liquido*1 carpeta_archiv*1 hojas_oficio_1raya*1 lapiz_2b*1 marc12*1 marc_superfino*1 tempera_suelta*5 pincel12*1 pincel8*1 pincel2*1 cuad_univ50_1r*3 repuesto_univ*1 repuesto_cuad*1 calc_cient*1 tabla_periodica*1 plastilina*1 flauta*1 goma_eva*2 cartulina_blanca*1 silicona_fria*1 tijera*1','Libros de texto (Santillana, Alianza, Emina Nasser, etc.)|Bata de laboratorio|Buzo y remera del colegio|Cuadernillos de Feria de Ciencias|Recipientes y tela para pinceles|Inglés y CES (librería del colegio)')
+),
+r as (
+  select cs, gs, o*10 as o, split_part(x,'*',1) as k, split_part(x,'*',2)::int as c, null::text as fuera
+  from l0, unnest(string_to_array(u,' ')) with ordinality as t(x,o)
+  union all
+  select cs, gs, 1000 + o*10, null, 1, x
+  from l0, unnest(string_to_array(nullif(f,''),'|')) with ordinality as t(x,o)
+)
+insert into web.utiles_renglones (lista_id,orden,texto,cantidad,tipo,cod_articulo,cod_alternativa,coincidencia,nota)
+select l.id, r.o, coalesce(n.t, r.fuera), r.c, case when r.fuera is null then 'util' else 'fuera' end,
+       n.cod, n.alt, coalesce(n.co,'sin_catalogo'), n.nota
+from r left join n on n.k=r.k
+join web.utiles_colegios c on substr(c.slug,10,4)=r.cs
+join web.utiles_listas l on l.colegio_id=c.id and l.anio=2026 and l.grado_slug=r.gs;

@@ -3,6 +3,7 @@ import { SITE } from "@/lib/config";
 import { consultar, type Filtro } from "@/lib/db";
 import { CON_STOCK, getColecciones, getMenu, getRubros } from "@/lib/data";
 import { urlProducto } from "@/lib/format";
+import { getColegiosUtiles } from "@/lib/utiles";
 
 export const revalidate = 3600;
 
@@ -18,7 +19,7 @@ async function todos<T>(tabla: string, select: string, filtros: Filtro[] = []) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [menu, colecciones, productos, marcas, rubros] = await Promise.all([
+  const [menu, colecciones, productos, marcas, rubros, colegios] = await Promise.all([
     getMenu(),
     getColecciones(),
     todos<{ cod_articulo: string; nombre: string; slug: string | null; cant_dispon: number | null }>(
@@ -28,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     todos<{ slug: string }>("marcas", "slug", [{ op: "eq", col: "publicar", val: true }]),
     getRubros(),
+    getColegiosUtiles(),
   ]);
 
   const u = (p: string) => `${SITE.url}${p}`;
@@ -38,6 +40,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: u("/categorias"), changeFrequency: "weekly", priority: 0.6 },
     { url: u("/rubro"), changeFrequency: "weekly", priority: 0.6 },
     ...["formas-de-entrega", "politicas-de-devolucion", "nosotros"].map((s) => ({ url: u(`/info/${s}`), changeFrequency: "monthly" as const, priority: 0.3 })),
+    { url: u("/utiles"), changeFrequency: "weekly", priority: 0.7 },
+    ...colegios.flatMap((c) => c.grados.map((g) => ({ url: u(`/utiles/${c.slug}/${g.slug}`), changeFrequency: "weekly" as const, priority: 0.6 }))),
     ...rubros.map((r) => ({ url: u(`/rubro/${r.slug}`), changeFrequency: "daily" as const, priority: 0.7 })),
     ...menu.map((d) => ({ url: u(`/d/${d.slug}`), changeFrequency: "daily" as const, priority: 0.8 })),
     ...[...lineas].map((s) => ({ url: u(`/c/${s}`), changeFrequency: "daily" as const, priority: 0.8 })),

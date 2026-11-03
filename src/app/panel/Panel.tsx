@@ -9,6 +9,7 @@ import { refrescarWeb as refrescar, sb } from "./cliente";
 import Banners from "./Banners";
 import Empresas from "./Empresas";
 import Presupuestos from "./Presupuestos";
+import Utiles from "./Utiles";
 import ErpPedido from "./ErpPedido";
 import VerComprobante from "./VerComprobante";
 
@@ -93,7 +94,7 @@ export default function Panel() {
 }
 
 function Secciones({ email }: { email: string }) {
-  const [seccion, setSeccion] = useState<"pedidos" | "presupuestos" | "empresas" | "banners">("pedidos");
+  const [seccion, setSeccion] = useState<"pedidos" | "presupuestos" | "utiles" | "empresas" | "banners">("pedidos");
   const tab = (s: typeof seccion, texto: string) => (
     <button
       onClick={() => setSeccion(s)}
@@ -104,9 +105,10 @@ function Secciones({ email }: { email: string }) {
   );
   return (
     <>
-      <div className="contenedor flex gap-1 border-b border-borde pt-3">
+      <div className="contenedor flex gap-1 overflow-x-auto border-b border-borde pt-3 whitespace-nowrap">
         {tab("pedidos", "Pedidos")}
         {tab("presupuestos", "Presupuestos")}
+        {tab("utiles", "Útiles")}
         {tab("empresas", "Empresas")}
         {tab("banners", "Banners")}
       </div>
@@ -114,6 +116,8 @@ function Secciones({ email }: { email: string }) {
         <Lista email={email} />
       ) : seccion === "presupuestos" ? (
         <Presupuestos email={email} />
+      ) : seccion === "utiles" ? (
+        <Utiles email={email} />
       ) : seccion === "empresas" ? (
         <Empresas />
       ) : (
