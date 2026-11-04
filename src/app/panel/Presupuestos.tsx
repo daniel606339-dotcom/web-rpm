@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { gs, linkWhatsApp } from "@/lib/format";
 import { sb } from "./cliente";
+import ArmarPresupuesto from "./ArmarPresupuesto";
 
 interface Item {
   linea: number;
@@ -27,14 +28,18 @@ interface Presupuesto {
   observaciones: string | null;
   cod_cliente: string | null;
   total: number;
-  estado: "nuevo" | "contactado" | "ganado" | "perdido";
+  estado: "borrador" | "nuevo" | "contactado" | "ganado" | "perdido";
+  origen: "web" | "vendedor";
+  vendedor_nombre: string | null;
+  erp_estado: string | null;
   nota_interna: string | null;
   actualizado_por: string | null;
   presupuesto_items: Item[];
 }
 
-const ESTADOS = ["nuevo", "contactado", "ganado", "perdido"] as const;
+const ESTADOS = ["borrador", "nuevo", "contactado", "ganado", "perdido"] as const;
 const COLOR: Record<string, string> = {
+  borrador: "bg-[#e3e6ec] text-texto",
   nuevo: "bg-acento text-white",
   contactado: "bg-marca text-white",
   ganado: "bg-ok text-white",
@@ -54,6 +59,7 @@ export default function Presupuestos({ email }: { email: string }) {
   const [abierto, setAbierto] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
+  const [editor, setEditor] = useState<{ id: number | null } | null>(null);
 
   const cargar = useCallback(async () => {
     const { data, error } = await sb.from("presupuestos").select("*, presupuesto_items(*)").order("creado_at", { ascending: false }).limit(300);
@@ -84,7 +90,7 @@ export default function Presupuestos({ email }: { email: string }) {
   }
 
   const visibles = lista.filter((p) =>
-    filtro === "todos" ? true : filtro === "abiertos" ? ["nuevo", "contactado"].includes(p.estado) : p.estado === filtro,
+    filtro === "todos" ? true : filtro === "abiertos" ? ["borrador", "nuevo", "contactado"].includes(p.estado) : p.estado === filtro,
   );
   const nuevos = lista.filter((p) => p.estado === "nuevo").length;
 
@@ -107,8 +113,16 @@ export default function Presupuestos({ email }: { email: string }) {
           <button onClick={cargar} className="h-10 rounded-lg border border-borde bg-white px-3">
             Actualizar
           </button>
+          <button onClick={() => setEditor(editor ? null : { id: null })} className="h-10 rounded-lg bg-acento px-4 font-bold text-white">
+            {editor ? "Cerrar" : "+ Armar presupuesto"}
+          </button>
         </div>
       </div>
+      {editor && (
+        <div className="mb-6">
+          <ArmarPresupuesto key={editor.id ?? "nuevo"} presupuestoId={editor.id} onListo={cargar} />
+        </div>
+      )}
       {error && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
       {cargando ? (
         <p className="text-suave">Cargando…</p>
@@ -125,13 +139,23 @@ export default function Presupuestos({ email }: { email: string }) {
                 <span className="font-bold text-marca">{p.numero}</span>
                 <span className="hidden text-sm text-suave md:block">{fecha(p.creado_at)}</span>
                 <span className="truncate">
-                  {p.cod_cliente && <span className="mr-1.5 rounded bg-marca px-1.5 py-0.5 text-[11px] font-bold text-white">EMPRESA</span>}
+                  {p.origen === "vendedor" ? (
+                    <span className="mr-1.5 rounded bg-[#5b3fa8] px-1.5 py-0.5 text-[11px] font-bold text-white">{p.vendedor_nombre ?? "VENDEDORA"}</span>
+                  ) : (
+                    p.cod_cliente && <span className="mr-1.5 rounded bg-marca px-1.5 py-0.5 text-[11px] font-bold text-white">EMPRESA</span>
+                  )}
                   <b>{p.razon_social}</b> <span className="text-sm text-suave">· RUC {p.ruc}</span>
                 </span>
                 <span className="hidden text-right font-bold md:block">{gs(p.total)}</span>
                 <span className={`rounded-full px-2.5 py-1 text-center text-xs font-bold ${COLOR[p.estado]}`}>{p.estado}</span>
               </button>
-              {abierto === p.id && <Detalle p={p} onCambio={(c) => actualizar(p, c)} />}
+              {abierto === p.id && (
+                <Detalle
+                  p={p}
+                  onCambio={(c) => actualizar(p, c)}
+                  onEditar={p.origen === "vendedor" && p.erp_estado !== "enviado" ? () => setEditor({ id: p.id }) : undefined}
+                />
+              )}
             </li>
           ))}
         </ul>
@@ -140,7 +164,15 @@ export default function Presupuestos({ email }: { email: string }) {
   );
 }
 
-function Detalle({ p, onCambio }: { p: Presupuesto; onCambio: (c: Partial<Pick<Presupuesto, "estado" | "nota_interna">>) => void }) {
+function Detalle({
+  p,
+  onCambio,
+  onEditar,
+}: {
+  p: Presupuesto;
+  onCambio: (c: Partial<Pick<Presupuesto, "estado" | "nota_interna">>) => void;
+  onEditar?: () => void;
+}) {
   const [nota, setNota] = useState(p.nota_interna ?? "");
   const items = [...p.presupuesto_items].sort((a, b) => a.linea - b.linea);
   const enlace = `/presupuesto/${p.numero}?t=${p.token}`;
@@ -187,6 +219,17 @@ function Detalle({ p, onCambio }: { p: Presupuesto; onCambio: (c: Partial<Pick<P
         <a href={enlace} target="_blank" rel="noopener" className="mt-3 inline-flex h-10 items-center rounded-lg border-[1.5px] border-marca px-4 text-sm font-bold text-marca">
           Ver la hoja del presupuesto (PDF)
         </a>
+        {onEditar && (
+          <button
+            onClick={() => {
+              onEditar();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            className="ml-2 mt-3 inline-flex h-10 items-center rounded-lg bg-marca px-4 text-sm font-bold text-white"
+          >
+            Editar
+          </button>
+        )}
       </div>
       <div className="space-y-3 text-sm">
         <div className="rounded-lg bg-white p-3 leading-relaxed">

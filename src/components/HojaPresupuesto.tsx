@@ -34,6 +34,8 @@ export interface Presupuesto {
   iva5: number;
   total: number;
   items: ItemPresupuesto[];
+  vendedor_nombre?: string | null;
+  borrador?: boolean;
 }
 
 const fecha = (s: string) =>
@@ -59,6 +61,11 @@ export default function HojaPresupuesto({ p, enlace }: { p: Presupuesto; enlace:
 
   return (
     <div className="hoja-presupuesto relative flex min-h-[1123px] w-[794px] flex-col bg-white text-texto">
+      {p.borrador && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center" aria-hidden>
+          <span className="-rotate-[30deg] font-titulo text-[120px] font-extrabold tracking-[8px] text-acento/15">BORRADOR</span>
+        </div>
+      )}
       <div className="h-2 bg-marca" />
       <div className="flex items-start justify-between px-14 pt-8">
         <Image src="/logo.png" alt="Distribuidora RPM" width={150} height={73} className="h-[73px] w-[150px] object-contain" priority />
@@ -94,7 +101,7 @@ export default function HojaPresupuesto({ p, enlace }: { p: Presupuesto; enlace:
         </div>
         <div className="flex flex-col gap-[3px] rounded-[10px] border-[1.5px] border-borde px-3.5 py-3">
           <p className={`${etiqueta} mb-0.5`}>Atendido por</p>
-          <p className="m-0 text-base font-bold text-titulo">Ventas · Distribuidora RPM</p>
+          <p className="m-0 text-base font-bold text-titulo">{p.vendedor_nombre ?? "Ventas"} · Distribuidora RPM</p>
           <p className="m-0 text-[13px]">{SITE.email}</p>
           <p className="m-0 text-[13px]">WhatsApp {SITE.whatsappVisible.replace("+595 ", "0")}</p>
           <p className="m-0 text-[13px]">Sujeto a disponibilidad de stock</p>
