@@ -31,7 +31,11 @@ interface Presupuesto {
   estado: "borrador" | "nuevo" | "contactado" | "ganado" | "perdido";
   origen: "web" | "vendedor";
   vendedor_nombre: string | null;
-  erp_estado: string | null;
+  erp_estado: "aprobado" | "enviado" | "error" | null;
+  erp_nro: number | null;
+  erp_mensaje: string | null;
+  erp_aprobado_por: string | null;
+  cod_vendedor: string | null;
   nota_interna: string | null;
   actualizado_por: string | null;
   presupuesto_items: Item[];
@@ -153,7 +157,8 @@ export default function Presupuestos({ email }: { email: string }) {
                 <Detalle
                   p={p}
                   onCambio={(c) => actualizar(p, c)}
-                  onEditar={p.origen === "vendedor" && p.erp_estado !== "enviado" ? () => setEditor({ id: p.id }) : undefined}
+                  onRecargar={cargar}
+                  onEditar={p.origen === "vendedor" && (p.erp_estado == null || p.erp_estado === "error") ? () => setEditor({ id: p.id }) : undefined}
                 />
               )}
             </li>
@@ -168,10 +173,12 @@ function Detalle({
   p,
   onCambio,
   onEditar,
+  onRecargar,
 }: {
   p: Presupuesto;
   onCambio: (c: Partial<Pick<Presupuesto, "estado" | "nota_interna">>) => void;
   onEditar?: () => void;
+  onRecargar: () => void;
 }) {
   const [nota, setNota] = useState(p.nota_interna ?? "");
   const items = [...p.presupuesto_items].sort((a, b) => a.linea - b.linea);
@@ -256,6 +263,7 @@ function Detalle({
           </p>
           <p className="mt-2 text-suave">Vence: {fecha(p.vence_at)}</p>
         </div>
+        {p.origen === "vendedor" && <ErpPresupuesto p={p} onCambio={onRecargar} />}
         <label className="block">
           <span className="mb-1 block font-semibold">Estado</span>
           <select
@@ -279,6 +287,69 @@ function Detalle({
         </button>
         {p.actualizado_por && <p className="text-xs text-suave">Último cambio: {p.actualizado_por}</p>}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Bloque "Inventiva" de un presupuesto armado por una vendedora: lo pone en cola para que
+ * sync-presupuestos-erp.ps1 lo grabe como PRE B en el ERP.
+ */
+function ErpPresupuesto({ p, onCambio }: { p: Presupuesto; onCambio: () => void }) {
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function rpc(nombre: "presupuesto_erp_aprobar" | "presupuesto_erp_cancelar") {
+    setEnviando(true);
+    setError(null);
+    const { error } = await sb.rpc(nombre, { p_id: p.id });
+    setEnviando(false);
+    if (error) setError(error.message);
+    else onCambio();
+  }
+
+  const puedeEnviar = p.erp_estado == null || p.erp_estado === "error";
+  const falta = p.estado === "borrador" ? "Es un borrador: primero generá el presupuesto." : !p.cod_cliente ? "Falta el cliente de Inventiva: tocá Editar y elegí el cliente." : null;
+
+  return (
+    <div className="space-y-2 rounded-lg bg-white p-3">
+      <p className="font-bold">Inventiva</p>
+      {p.erp_estado === "enviado" && (
+        <p className="rounded bg-ok/10 p-2 font-semibold text-ok">
+          Grabado como PRE B {p.erp_nro} · cliente {p.cod_cliente}
+        </p>
+      )}
+      {p.erp_estado === "aprobado" && (
+        <>
+          <p className="rounded bg-acento/10 p-2">
+            En cola para el ERP (cliente {p.cod_cliente}). El servidor lo graba en unos minutos.
+            {p.erp_aprobado_por ? ` Envió ${p.erp_aprobado_por}.` : ""}
+          </p>
+          <button onClick={() => rpc("presupuesto_erp_cancelar")} className="text-xs text-suave underline">
+            Sacar de la cola
+          </button>
+        </>
+      )}
+      {p.erp_estado === "error" && <p className="rounded bg-red-50 p-2 text-red-700">No se pudo grabar: {p.erp_mensaje}</p>}
+      {puedeEnviar &&
+        (falta ? (
+          <p className="text-suave">{falta}</p>
+        ) : (
+          <>
+            <button
+              onClick={() => rpc("presupuesto_erp_aprobar")}
+              disabled={enviando}
+              className="h-10 w-full rounded-lg bg-marca font-bold text-white disabled:opacity-50"
+            >
+              {enviando ? "Enviando…" : p.erp_estado === "error" ? "Reintentar envío al ERP" : "Enviar al ERP"}
+            </button>
+            <p className="text-xs text-suave">
+              Se graba como presupuesto PRE B con el cliente {p.cod_cliente}
+              {p.cod_vendedor ? `, vendedor ${p.cod_vendedor}` : ", vendedor de la ficha del cliente"}. Revisalo antes: después de grabado ya no se edita acá.
+            </p>
+          </>
+        ))}
+      {error && <p className="text-red-700">{error}</p>}
     </div>
   );
 }
