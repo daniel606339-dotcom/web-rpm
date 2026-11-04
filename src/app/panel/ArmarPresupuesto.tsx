@@ -37,6 +37,19 @@ interface Fila {
 
 const campo = "h-10 w-full rounded-lg border border-borde bg-white px-3 text-sm outline-none focus:border-marca";
 const clave = () => Math.random().toString(36).slice(2);
+/** Artículo "Servicio de Envio" de Inventiva: no está en la tienda, el monto lo escribe la vendedora. */
+const ENVIO = "0000000000736";
+const filaEnvio = (): Fila => ({
+  clave: clave(),
+  texto: "",
+  cod: ENVIO,
+  cantidad: 1,
+  coincidencia: "manual",
+  nota: "",
+  candidatos: [{ cod_articulo: ENVIO, nombre: "Servicio de Envío", precio_lista: 0, precio: 0, regla: "Envío: escribí el monto", cant_dispon: 1, porc_iva: 10 }],
+  precio: null,
+  precioManual: true,
+});
 const ETIQUETA: Record<Fila["coincidencia"], string> = {
   igual: "bg-ok/10 text-ok",
   equivalente: "bg-[#fff4ed] text-[#a33600]",
@@ -204,6 +217,7 @@ export default function ArmarPresupuesto({ presupuestoId, onListo }: { presupues
     setError(null);
     const validas = filas.filter((f) => f.cod);
     if (!validas.length) return setError("No hay artículos elegidos.");
+    if (validas.some((f) => f.cod === ENVIO && !f.precio)) return setError("Escribí el monto del envío.");
     if (!cliente && (!sinCliente.razon_social.trim() || !sinCliente.ruc.trim())) return setError("Elegí el cliente o escribí razón social y RUC.");
     setGuardando(true);
     const { data, error } = await sb.rpc("guardar_presupuesto_vendedor", {
@@ -218,7 +232,7 @@ export default function ArmarPresupuesto({ presupuestoId, onListo }: { presupues
         items: validas.map((f) => ({
           cod: f.cod,
           cantidad: f.cantidad,
-          texto_cliente: f.texto,
+          texto_cliente: f.cod === ENVIO ? "" : f.texto,
           coincidencia: f.coincidencia,
           nota: f.nota,
           precio_manual: f.precioManual,
@@ -318,6 +332,9 @@ export default function ArmarPresupuesto({ presupuestoId, onListo }: { presupues
           <button onClick={() => setFilas((xs) => [...xs, { clave: clave(), texto: "", cod: null, cantidad: 1, coincidencia: "manual", nota: "", candidatos: [], precio: null, precioManual: false }])} className="h-10 rounded-lg border border-borde px-3 text-sm">
             + Renglón a mano
           </button>
+          <button onClick={() => setFilas((xs) => [...xs, filaEnvio()])} className="h-10 rounded-lg border border-borde px-3 text-sm">
+            + Costo de envío
+          </button>
         </div>
       </section>
 
@@ -401,7 +418,9 @@ function FilaEditor({ f, codCliente, onCambio, onQuitar }: { f: Fila; codCliente
           <option value="">— Sin artículo —</option>
           {f.candidatos.map((c) => (
             <option key={c.cod_articulo} value={c.cod_articulo}>
-              {c.nombre} · {gs(c.precio)} · {Number(c.cant_dispon) > 0 ? `${Math.floor(Number(c.cant_dispon))} disp.` : "sin stock"} · {c.cod_articulo}
+              {c.cod_articulo === ENVIO
+                ? `${c.nombre} · ${c.cod_articulo}`
+                : `${c.nombre} · ${gs(c.precio)} · ${Number(c.cant_dispon) > 0 ? `${Math.floor(Number(c.cant_dispon))} disp.` : "sin stock"} · ${c.cod_articulo}`}
             </option>
           ))}
         </select>
@@ -418,7 +437,7 @@ function FilaEditor({ f, codCliente, onCambio, onQuitar }: { f: Fila; codCliente
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-suave">
         {elegido && <span>{elegido.regla}{f.precioManual ? " · precio a mano" : ""}</span>}
-        {f.precioManual && (
+        {f.precioManual && f.cod !== ENVIO && (
           <button onClick={() => onCambio({ precioManual: false, precio: elegido ? Number(elegido.precio) : null })} className="underline">
             volver al precio de lista
           </button>
