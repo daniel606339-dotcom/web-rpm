@@ -58,6 +58,13 @@ function extraerJson<T>(texto: string): T {
 const norm = (t: string) =>
   t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[°º]/g, ".").replace(/\s+/g, " ").trim();
 
+/** Texto para lo aprendido: sin la cantidad del principio ("12 resma oficio" -> "resma oficio"). Igual que web.norm_aprendizaje. */
+const normAprendizaje = (t: string) => {
+  const n = norm(t);
+  const sin = n.replace(/^\d+([.,]\d+)?\s*(x\s+|u\.?\s+|unid\.?\s+|unidades\s+)?/, "").trim();
+  return sin || n;
+};
+
 async function embedding(texto: string): Promise<number[] | null> {
   const key = Deno.env.get("OPENAI_API_KEY");
   if (!key) return null;
@@ -95,6 +102,7 @@ STOCK: elegí SIEMPRE un artículo con stock (stock > 0) si alguno sirve, aunque
 Si el cliente no especifica un atributo (color, tamaño, marca), elegí la opción más común (azul o negro en bolígrafos, A4 u oficio según lo pedido) entre las que tienen más stock, y aclaralo en la nota.
 Fijate que el candidato sea el MISMO tipo de producto (un porta bolígrafos no es un bolígrafo; un folio no es una tapa de encuadernación). Si no hay del mismo tipo, es "no_trabajamos".
 Si el cliente exige marca y no hay, es "equivalente" y la nota lo dice.
+Si el renglón trae "elegido_antes", es el artículo que una vendedora de RPM eligió antes para ese mismo pedido: elegilo, salvo que no tenga stock y haya otro del mismo tipo con stock.
 Respondé SOLO con JSON: {"elecciones":[{"i":0,"cod":"...","coincidencia":"igual","nota":""}]}`;
 
 Deno.serve(async (req) => {
@@ -137,12 +145,18 @@ Deno.serve(async (req) => {
 
     // 2) Candidatos: lo aprendido + búsqueda por texto + (opcional) similitud
     const servicio = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { db: { schema: "web" } });
-    const textos = renglones.map((r) => norm(r.texto));
+    const textos = renglones.map((r) => normAprendizaje(r.texto));
     const { data: aprendidas } = await servicio
       .from("asignaciones_texto")
       .select("texto_norm, cod_cliente, cod_articulo")
       .in("texto_norm", textos)
       .in("cod_cliente", [codCliente ?? "", ""]);
+
+    const previas: (string | null)[] = textos.map(
+      (t) =>
+        ((aprendidas ?? []).find((a) => a.texto_norm === t && a.cod_cliente === (codCliente ?? "")) ??
+          (aprendidas ?? []).find((a) => a.texto_norm === t))?.cod_articulo ?? null,
+    );
 
     const candidatos: Candidato[][] = await Promise.all(
       renglones.map(async (r, i) => {
@@ -151,9 +165,7 @@ Deno.serve(async (req) => {
           const { data } = await servicio.rpc("buscar_articulos_vendedor", { p_q: q, p_cod_cliente: codCliente, p_limite: n });
           for (const c of (data ?? []) as Candidato[]) if (!lista.has(c.cod_articulo)) lista.set(c.cod_articulo, c);
         };
-        const previa = (aprendidas ?? []).find((a) => a.texto_norm === textos[i] && a.cod_cliente === (codCliente ?? "")) ??
-          (aprendidas ?? []).find((a) => a.texto_norm === textos[i]);
-        if (previa) await buscar(previa.cod_articulo, 1);
+        if (previas[i]) await buscar(previas[i]!, 1);
         const patrones = (r.patrones ?? []).filter((x) => x && x.trim());
         const porPatron = async (conStock: boolean, n: number) => {
           if (!patrones.length) return;
@@ -186,6 +198,7 @@ Deno.serve(async (req) => {
       pedido: r.texto,
       cantidad: r.cantidad,
       marca_exigida: r.marca ?? null,
+      elegido_antes: previas[i] && candidatos[i].some((c) => c.cod_articulo === previas[i]) ? previas[i] : null,
       candidatos: candidatos[i].map((c) => ({ cod: c.cod_articulo, nombre: c.nombre, precio: c.precio, stock: Math.floor(Number(c.cant_dispon) || 0) })),
     }));
     const eleccion = extraerJson<{ elecciones: { i: number; cod: string | null; coincidencia: string; nota?: string }[] }>(
