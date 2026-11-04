@@ -380,6 +380,9 @@ function FilaEditor({ f, codCliente, onCambio, onQuitar }: { f: Fila; codCliente
           Pidió: <b className="text-texto">{f.texto || "—"}</b>
         </span>
         <span className="flex items-center gap-2">
+          {elegido && Number(elegido.cant_dispon) <= 0 && f.candidatos.length > 1 && (
+            <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">Sin stock</span>
+          )}
           <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${ETIQUETA[f.coincidencia]}`}>{TEXTO_ETIQUETA[f.coincidencia]}</span>
           <button onClick={onQuitar} className="text-xs text-suave underline">
             Quitar
