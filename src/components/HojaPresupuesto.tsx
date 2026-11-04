@@ -36,6 +36,8 @@ export interface Presupuesto {
   items: ItemPresupuesto[];
   vendedor_nombre?: string | null;
   borrador?: boolean;
+  /** Condición de venta de la ficha del cliente (Contado, Crédito 30 días...). */
+  condicion?: string | null;
 }
 
 const fecha = (s: string) =>
@@ -79,7 +81,7 @@ export default function HojaPresupuesto({ p, enlace }: { p: Presupuesto; enlace:
         {[
           ["Fecha", fecha(p.creado_at)],
           ["Válido hasta", `${fecha(p.vence_at)} · ${p.validez_dias} días`],
-          ["Condición", "Contado"],
+          ["Condición", p.condicion ?? "Contado"],
           ["Entrega", "24/72 hs hábiles"],
         ].map(([t, v]) => (
           <div key={t} className="flex-1 rounded-[10px] bg-fondo px-3.5 py-2.5">
