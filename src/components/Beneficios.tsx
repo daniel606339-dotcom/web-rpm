@@ -3,7 +3,7 @@ import { getEnvioDesde } from "@/lib/data";
 import { gs } from "@/lib/format";
 import { IconoCamion, IconoFactura, IconoTarjeta, IconoTienda } from "./iconos";
 
-/** Lo que el cliente gana comprando acá: envío, retiro, factura y pago. Los montos salen de web.localidades. */
+/** Lo que el cliente gana comprando acá: envío, retiro, presupuesto y pago. Los montos salen de web.localidades. */
 export async function listaBeneficios() {
   const desde = await getEnvioDesde();
   return [
@@ -14,7 +14,7 @@ export async function listaBeneficios() {
       href: "/info/formas-de-entrega",
     },
     { Icono: IconoTienda, titulo: "Retiro sin costo", texto: "Listo en 2 horas en nuestro depósito", href: "/info/formas-de-entrega" },
-    { Icono: IconoFactura, titulo: "Factura legal", texto: "A nombre de tu empresa, con tu RUC" },
+    { Icono: IconoFactura, titulo: "Presupuesto al instante", texto: "Armalo vos y descargalo en PDF", href: "/presupuesto/nuevo" },
     { Icono: IconoTarjeta, titulo: "Comprá sin crear cuenta", texto: "Pagás por transferencia bancaria" },
   ];
 }
