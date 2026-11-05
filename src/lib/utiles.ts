@@ -60,3 +60,6 @@ export async function getColegiosUtiles(): Promise<ColegioResumen[]> {
 export async function getListaUtiles(colegio: string, grado: string): Promise<ListaUtiles | null> {
   return rpc<ListaUtiles | null>("utiles_lista_publica", { p_colegio: colegio, p_grado: grado }, REVALIDAR);
 }
+
+
+export { anioEscolar, esReferencia } from "./anioEscolar";

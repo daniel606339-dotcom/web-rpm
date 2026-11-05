@@ -8,7 +8,7 @@ import BuscadorColegios from "./BuscadorColegios";
 export const revalidate = 900;
 
 export const metadata: Metadata = {
-  title: "Listas de útiles escolares 2026",
+  title: "Listas de útiles escolares",
   description:
     "Buscá la lista de útiles de tu colegio y grado, sacá lo que ya tenés y reservá el resto en Distribuidora RPM. Precio al instante, retiro en el local o delivery en Asunción.",
   alternates: { canonical: "/utiles" },

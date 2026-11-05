@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { esReferencia } from "@/lib/anioEscolar";
 import type { ColegioResumen } from "@/lib/utiles";
 
 const normal = (s: string) =>
@@ -44,6 +45,7 @@ export default function BuscadorColegios({ colegios }: { colegios: ColegioResume
                     className="inline-flex h-9 items-center rounded-full border border-marca/30 bg-marca-suave px-3.5 text-sm font-semibold text-marca hover:border-marca"
                   >
                     {g.grado}
+                    {esReferencia(g.anio) && <span className="ml-1 text-xs font-normal text-suave">({g.anio})</span>}
                   </Link>
                 ))}
               </div>
