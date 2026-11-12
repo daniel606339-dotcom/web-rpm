@@ -33,7 +33,18 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 }
 
-async function claude(system: string, content: unknown[], maxTokens = 4000): Promise<string> {
+function extraerJson<T>(texto: string): T {
+  const i = texto.indexOf("{");
+  const f = texto.lastIndexOf("}");
+  if (i < 0 || f < i) throw new Error("La IA no devolvió datos legibles");
+  return JSON.parse(texto.slice(i, f + 1)) as T;
+}
+
+/**
+ * Pide a Claude la respuesta como "herramienta" con esquema: la API devuelve el objeto ya armado,
+ * así no se rompe con comillas o barras dentro de los textos (listas largas, medidas como 24" o 8/0).
+ */
+async function claudeJson<T>(system: string, content: unknown[], esquema: Record<string, unknown>, maxTokens: number): Promise<T> {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -41,19 +52,68 @@ async function claude(system: string, content: unknown[], maxTokens = 4000): Pro
       "anthropic-version": "2023-06-01",
       "content-type": "application/json",
     },
-    body: JSON.stringify({ model: MODELO, max_tokens: maxTokens, system, messages: [{ role: "user", content }] }),
+    body: JSON.stringify({
+      model: MODELO,
+      max_tokens: maxTokens,
+      system,
+      tools: [{ name: "responder", description: "Devuelve el resultado.", input_schema: esquema }],
+      tool_choice: { type: "tool", name: "responder" },
+      messages: [{ role: "user", content }],
+    }),
   });
   if (!r.ok) throw new Error(`Claude respondió ${r.status}: ${(await r.text()).slice(0, 300)}`);
   const d = await r.json();
-  return (d.content ?? []).filter((c: { type: string }) => c.type === "text").map((c: { text: string }) => c.text).join("");
+  const uso = (d.content ?? []).find((c: { type: string }) => c.type === "tool_use");
+  if (uso?.input) return uso.input as T;
+  if (d.stop_reason === "max_tokens") throw new Error("El pedido es muy largo: dividilo en dos partes");
+  return extraerJson<T>((d.content ?? []).filter((c: { type: string }) => c.type === "text").map((c: { text: string }) => c.text).join(""));
 }
 
-function extraerJson<T>(texto: string): T {
-  const i = texto.indexOf("{");
-  const f = texto.lastIndexOf("}");
-  if (i < 0 || f < i) throw new Error("La IA no devolvió datos legibles");
-  return JSON.parse(texto.slice(i, f + 1)) as T;
-}
+const txtNull = { type: ["string", "null"] };
+const ESQUEMA_LECTURA = {
+  type: "object",
+  properties: {
+    cliente: {
+      type: "object",
+      properties: { razon_social: txtNull, ruc: txtNull, contacto: txtNull, email: txtNull, telefono: txtNull },
+    },
+    renglones: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          texto: { type: "string" },
+          cantidad: { type: "number" },
+          busqueda: { type: "string" },
+          patrones: { type: "array", items: { type: "string" } },
+          excluir: txtNull,
+          marca: txtNull,
+        },
+        required: ["texto", "cantidad", "busqueda", "patrones"],
+      },
+    },
+  },
+  required: ["renglones"],
+};
+const ESQUEMA_ELECCION = {
+  type: "object",
+  properties: {
+    elecciones: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          i: { type: "integer" },
+          cod: txtNull,
+          coincidencia: { type: "string", enum: ["igual", "equivalente", "no_trabajamos"] },
+          nota: { type: "string" },
+        },
+        required: ["i", "cod", "coincidencia"],
+      },
+    },
+  },
+  required: ["elecciones"],
+};
 
 const norm = (t: string) =>
   t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[°º]/g, ".").replace(/\s+/g, " ").trim();
@@ -90,8 +150,9 @@ Reglas:
 - Sinónimos de Paraguay: borrador/goma, plasticola/cola blanca/adhesivo vinílico, crayola/crayón, lápiz de papel/grafito, sacapunta/sacapuntas, bibliorato/archivador, folio/funda, presilladora/abrochadora, chinche/tachuela, cinta scotch/cinta adhesiva, lavandina/cloro.
 - marca: solo si el cliente la exige.
 - Ignorá saludos, firmas y datos que no sean productos.
+- Si una lista trae una columna de cantidad y dice "NO", "0" o está tachado, ese renglón no se pide: no lo incluyas.
 - Si el mensaje trae datos del cliente (razón social, RUC, contacto, correo, teléfono), devolvelos en "cliente".
-Respondé SOLO con JSON: {"cliente":{"razon_social":null,"ruc":null,"contacto":null,"email":null,"telefono":null},"renglones":[{"texto":"","cantidad":1,"busqueda":"","patrones":[""],"excluir":null,"marca":null}]}`;
+Devolvé el resultado con la herramienta "responder", un renglón por producto (también los que no sean de librería o limpieza).`;
 
 const SISTEMA_ELECCION = `Sos vendedora experta de Distribuidora RPM (Paraguay). Para cada renglón pedido por el cliente te paso candidatos del catálogo (código, nombre, precio, stock).
 Elegí el mejor candidato para cada renglón, como lo haría una vendedora:
@@ -103,7 +164,7 @@ Si el cliente no especifica un atributo (color, tamaño, marca), elegí la opci�
 Fijate que el candidato sea el MISMO tipo de producto (un porta bolígrafos no es un bolígrafo; un folio no es una tapa de encuadernación). Si no hay del mismo tipo, es "no_trabajamos".
 Si el cliente exige marca y no hay, es "equivalente" y la nota lo dice.
 Si el renglón trae "elegido_antes", es el artículo que una vendedora de RPM eligió antes para ese mismo pedido: elegilo, salvo que no tenga stock y haya otro del mismo tipo con stock.
-Respondé SOLO con JSON: {"elecciones":[{"i":0,"cod":"...","coincidencia":"igual","nota":""}]}`;
+Devolvé una elección por cada renglón recibido (campo "i" igual al del renglón) con la herramienta "responder".`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -137,8 +198,8 @@ Deno.serve(async (req) => {
       }
     }
     contenido.push({ type: "text", text: texto.trim() ? `Mensaje del cliente:\n${texto}` : "Extraé los productos del archivo adjunto." });
-    const lectura = extraerJson<{ cliente?: Record<string, string | null>; renglones: Renglon[] }>(
-      await claude(SISTEMA_LECTURA, contenido, 6000),
+    const lectura = await claudeJson<{ cliente?: Record<string, string | null>; renglones: Renglon[] }>(
+      SISTEMA_LECTURA, contenido, ESQUEMA_LECTURA, 16000,
     );
     const renglones = (lectura.renglones ?? []).filter((r) => r.texto || r.busqueda).slice(0, 120);
     if (renglones.length === 0) return json({ cliente: lectura.cliente ?? null, renglones: [] });
@@ -201,10 +262,16 @@ Deno.serve(async (req) => {
       elegido_antes: previas[i] && candidatos[i].some((c) => c.cod_articulo === previas[i]) ? previas[i] : null,
       candidatos: candidatos[i].map((c) => ({ cod: c.cod_articulo, nombre: c.nombre, precio: c.precio, stock: Math.floor(Number(c.cant_dispon) || 0) })),
     }));
-    const eleccion = extraerJson<{ elecciones: { i: number; cod: string | null; coincidencia: string; nota?: string }[] }>(
-      await claude(SISTEMA_ELECCION, [{ type: "text", text: JSON.stringify(resumen) }], 6000),
+    // listas largas: se eligen de a 25 renglones en paralelo
+    type Eleccion = { i: number; cod: string | null; coincidencia: string; nota?: string };
+    const tandas: (typeof resumen)[] = [];
+    for (let k = 0; k < resumen.length; k += 25) tandas.push(resumen.slice(k, k + 25));
+    const elegidas = await Promise.all(
+      tandas.map((t) =>
+        claudeJson<{ elecciones: Eleccion[] }>(SISTEMA_ELECCION, [{ type: "text", text: JSON.stringify(t) }], ESQUEMA_ELECCION, 8000),
+      ),
     );
-    const porIndice = new Map(eleccion.elecciones.map((e) => [e.i, e]));
+    const porIndice = new Map(elegidas.flatMap((e) => e.elecciones ?? []).map((e) => [e.i, e]));
 
     return json({
       cliente: lectura.cliente ?? null,
