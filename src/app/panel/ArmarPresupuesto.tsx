@@ -442,9 +442,19 @@ function FilaEditor({
         </div>
       )}
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm">
-        <span className="text-suave">
-          Pidió: <b className="text-texto">{f.texto || "—"}</b>
-        </span>
+        {f.cod === ENVIO ? (
+          <span className="text-suave">Costo de envío</span>
+        ) : (
+          <label className="flex min-w-0 flex-1 items-center gap-1.5 text-suave" title="Lo que escribió el cliente. Con esto el sistema aprende qué artículo corresponde.">
+            Pidió:
+            <input
+              value={f.texto}
+              onChange={(e) => onCambio({ texto: e.target.value })}
+              placeholder="Lo que escribió el cliente (para que el sistema aprenda)"
+              className={`h-8 min-w-0 flex-1 rounded border px-2 font-bold text-texto ${f.texto ? "border-transparent bg-transparent hover:border-borde focus:border-marca" : "border-acento bg-white"}`}
+            />
+          </label>
+        )}
         <span className="flex items-center gap-2">
           {elegido && Number(elegido.cant_dispon) <= 0 && f.candidatos.length > 1 && (
             <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">Sin stock</span>
@@ -494,7 +504,7 @@ function FilaEditor({
         {f.nota && <span className="text-[#a33600]">· {f.nota}</span>}
       </div>
       <div className="mt-2 flex gap-2">
-        <input value={busca} onChange={(e) => setBusca(e.target.value)} onKeyDown={(e) => e.key === "Enter" && buscar()} placeholder="Buscar otro artículo (nombre o código)" className={`${campo} h-9`} />
+        <input value={busca} onChange={(e) => setBusca(e.target.value)} onKeyDown={(e) => e.key === "Enter" && buscar()} placeholder="Cambiar artículo: buscá por nombre o código" className={`${campo} h-9`} />
         <button onClick={buscar} className="h-9 rounded-lg border border-borde px-3 text-sm">
           {buscando ? "…" : "Buscar"}
         </button>
