@@ -163,6 +163,7 @@ STOCK: elegí SIEMPRE un artículo con stock (stock > 0) si alguno sirve, aunque
 Si el cliente no especifica un atributo (color, tamaño, marca), elegí la opción más común (azul o negro en bolígrafos, A4 u oficio según lo pedido) entre las que tienen más stock, y aclaralo en la nota.
 Fijate que el candidato sea el MISMO tipo de producto (un porta bolígrafos no es un bolígrafo; un folio no es una tapa de encuadernación). Si no hay del mismo tipo, es "no_trabajamos".
 Si el cliente exige marca y no hay, es "equivalente" y la nota lo dice.
+NO repitas el mismo artículo en dos renglones: si el cliente pide dos medidas, colores o tamaños distintos (por ejemplo bobina 80x55 y bobina 57x38, carpeta azul y carpeta blanca), cada renglón lleva el candidato que corresponde a su medida o color. Si para alguno no hay, es "no_trabajamos" o "equivalente" con nota, pero nunca el mismo artículo que otro renglón.
 Si el renglón trae "elegido_antes", es el artículo que una vendedora de RPM eligió antes para ese mismo pedido: elegilo, salvo que no tenga stock y haya otro del mismo tipo con stock.
 Devolvé una elección por cada renglón recibido (campo "i" igual al del renglón) con la herramienta "responder".`;
 

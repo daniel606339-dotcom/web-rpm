@@ -213,11 +213,28 @@ export default function ArmarPresupuesto({ presupuestoId, onListo }: { presupues
 
   const cambiar = (k: string, c: Partial<Fila>) => setFilas((xs) => xs.map((f) => (f.clave === k ? { ...f, ...c } : f)));
 
+  // Mismo artículo en más de un renglón: casi siempre es un error de elección (otra medida, otro color)
+  const primeraFila = new Map<string, { clave: string; pos: number }>();
+  filas.forEach((f, i) => {
+    if (f.cod && !primeraFila.has(f.cod)) primeraFila.set(f.cod, { clave: f.clave, pos: i + 1 });
+  });
+  const repetidas = filas.filter((f) => f.cod && primeraFila.get(f.cod)?.clave !== f.clave).length;
+
+  function unir(f: Fila) {
+    const primera = f.cod ? primeraFila.get(f.cod) : undefined;
+    if (!primera || primera.clave === f.clave) return;
+    setFilas((xs) =>
+      xs.filter((x) => x.clave !== f.clave).map((x) => (x.clave === primera.clave ? { ...x, cantidad: x.cantidad + f.cantidad } : x)),
+    );
+  }
+
   async function guardar(final: boolean) {
     setError(null);
     const validas = filas.filter((f) => f.cod);
     if (!validas.length) return setError("No hay artículos elegidos.");
     if (validas.some((f) => f.cod === ENVIO && !f.precio)) return setError("Escribí el monto del envío.");
+    if (final && repetidas > 0)
+      return setError("Hay artículos repetidos (marcados en rojo). Elegí otro artículo si es un producto distinto, o tocá «Unir cantidades».");
     if (!cliente && (!sinCliente.razon_social.trim() || !sinCliente.ruc.trim())) return setError("Elegí el cliente o escribí razón social y RUC.");
     setGuardando(true);
     const { data, error } = await sb.rpc("guardar_presupuesto_vendedor", {
@@ -344,10 +361,19 @@ export default function ArmarPresupuesto({ presupuestoId, onListo }: { presupues
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-bold">3. Revisá los artículos</h2>
             {sinArticulo > 0 && <span className="text-sm text-red-700">{sinArticulo} renglón(es) sin artículo: no van al presupuesto</span>}
+            {repetidas > 0 && <span className="text-sm font-bold text-red-700">{repetidas} artículo(s) repetido(s): revisalos antes de generar</span>}
           </div>
           <ul className="space-y-3">
             {filas.map((f) => (
-              <FilaEditor key={f.clave} f={f} codCliente={cliente?.cod_cliente ?? null} onCambio={(c) => cambiar(f.clave, c)} onQuitar={() => setFilas((xs) => xs.filter((x) => x.clave !== f.clave))} />
+              <FilaEditor
+                key={f.clave}
+                f={f}
+                codCliente={cliente?.cod_cliente ?? null}
+                repetidoDe={f.cod && primeraFila.get(f.cod)?.clave !== f.clave ? primeraFila.get(f.cod)?.pos : undefined}
+                onCambio={(c) => cambiar(f.clave, c)}
+                onQuitar={() => setFilas((xs) => xs.filter((x) => x.clave !== f.clave))}
+                onUnir={() => unir(f)}
+              />
             ))}
           </ul>
           <div className="flex items-baseline justify-end gap-3 border-t border-borde pt-3">
@@ -376,10 +402,25 @@ export default function ArmarPresupuesto({ presupuestoId, onListo }: { presupues
   );
 }
 
-function FilaEditor({ f, codCliente, onCambio, onQuitar }: { f: Fila; codCliente: string | null; onCambio: (c: Partial<Fila>) => void; onQuitar: () => void }) {
+function FilaEditor({
+  f,
+  codCliente,
+  repetidoDe,
+  onCambio,
+  onQuitar,
+  onUnir,
+}: {
+  f: Fila;
+  codCliente: string | null;
+  repetidoDe?: number;
+  onCambio: (c: Partial<Fila>) => void;
+  onQuitar: () => void;
+  onUnir: () => void;
+}) {
   const [busca, setBusca] = useState("");
   const [buscando, setBuscando] = useState(false);
   const elegido = f.candidatos.find((c) => c.cod_articulo === f.cod);
+  const esRepetido = repetidoDe !== undefined;
 
   async function buscar() {
     if (busca.trim().length < 2) return;
@@ -391,7 +432,15 @@ function FilaEditor({ f, codCliente, onCambio, onQuitar }: { f: Fila; codCliente
   }
 
   return (
-    <li className="rounded-lg border border-borde p-3">
+    <li className={`rounded-lg border p-3 ${esRepetido ? "border-2 border-red-600 bg-red-50/40" : "border-borde"}`}>
+      {esRepetido && (
+        <div className="mb-2 flex flex-wrap items-center gap-2 rounded bg-red-600 px-2 py-1 text-xs font-bold text-white">
+          <span>Este artículo ya está en el renglón {repetidoDe}. Si el cliente pidió otro producto (otra medida o color), elegí otro.</span>
+          <button onClick={onUnir} className="rounded bg-white px-2 py-0.5 text-red-700">
+            Unir cantidades
+          </button>
+        </div>
+      )}
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm">
         <span className="text-suave">
           Pidió: <b className="text-texto">{f.texto || "—"}</b>
